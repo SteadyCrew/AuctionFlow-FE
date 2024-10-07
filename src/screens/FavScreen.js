@@ -14,10 +14,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 24,
+    paddingTop: 10
   },
   text: {
-    fontSize: 14,
-    fontFamily: 'Pretendard-Regular',
+    fontSize: 18,
+    color: '#000',
+    fontFamily: 'Pretendard-Bold',
   },
 });
 

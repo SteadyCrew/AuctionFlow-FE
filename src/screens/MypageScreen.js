@@ -10,15 +10,17 @@ const MypageScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 24,
-  },
-  text: {
-    fontSize: 14,
-    fontFamily: 'Pretendard-Regular',
-  },
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      paddingHorizontal: 24,
+      paddingTop: 10
+    },
+    text: {
+      fontSize: 18,
+      color: '#000',
+      fontFamily: 'Pretendard-Bold',
+    },
 });
 
 export default MypageScreen;

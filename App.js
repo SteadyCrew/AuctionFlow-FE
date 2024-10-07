@@ -9,13 +9,13 @@ import FavScreen from './src/screens/FavScreen';
 import MypageScreen from './src/screens/MypageScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import NoteScreen from './src/screens/NoteScreen';
-import Header from './src/components/Header';
-import SearchHeader from './src/components/SearchHeader';
+import Header from './src/components/Headers/Header';
+import SearchHeader from './src/components/Headers/SearchHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
 import { StyleSheet, Text, View } from 'react-native';
-import NoteHeader from './src/components/NoteHeader';
-import RegisterHeader from './src/components/RegisterHeader';
+import NoteHeader from './src/components/Headers/NoteHeader';
+import RegisterHeader from './src/components/Headers/RegisterHeader';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -25,15 +25,18 @@ const Stack = createStackNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          ...styles.tabBar, // 기존 styles.tabBar를 그대로 사용
+          display: route.name === '등록' ? 'none' : 'flex', // 등록 화면에서는 숨기기
+        },
         tabBarActiveTintColor: '#5DADE2',
         tabBarInactiveTintColor: '#909090',
-      }}>
+      })}>
       <Tab.Screen
         name="홈"
-        component={HomeStack} // HomeStack으로 변경
+        component={HomeStack}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="home" size={22} color={color} />
@@ -43,33 +46,9 @@ function MainTabs() {
           ),
         }}
       />
-      <Tab.Screen 
-        name="내 거래"
-        component={MyDealsStack} // MyDealsStack으로 변경
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Icon2 name="shopping-bag" size={22} color={color} />
-          ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>내 거래</Text>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="등록"
-        component={RegisterStack} // RegisterStack으로 변경
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Icon2 name="plus-circle" size={22} color={color} />
-          ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>등록</Text>
-          ),
-        }}
-      />
       <Tab.Screen
         name="찜"
-        component={FavStack} // FavStack으로 변경
+        component={FavStack}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="heart" size={22} color={color} />
@@ -80,8 +59,32 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="등록"
+        component={RegisterStack}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Icon2 name="plus-circle" size={22} color={color} />
+          ),
+          tabBarLabel: ({ color }) => (
+            <Text style={[styles.label, { color }]}>등록</Text>
+          ),
+        }}
+      />
+      <Tab.Screen 
+        name="내 거래"
+        component={MyDealsStack}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Icon2 name="shopping-bag" size={22} color={color} />
+          ),
+          tabBarLabel: ({ color }) => (
+            <Text style={[styles.label, { color }]}>내 거래</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
         name="마이페이지"
-        component={MypageStack} // MypageStack으로 변경
+        component={MypageStack}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon2 name="user" size={22} color={color} />
@@ -94,6 +97,7 @@ function MainTabs() {
     </Tab.Navigator>
   );
 }
+
 
 // 스택 내비게이션을 각 탭에 추가합니다.
 const HomeStack = () => (
@@ -178,8 +182,8 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     fontFamily: 'Pretendard-Regular',
-    marginTop: -6,
-    marginBottom: 10,
+    paddingTop: -6,
+    paddingBottom: 10,
   },
 });
 

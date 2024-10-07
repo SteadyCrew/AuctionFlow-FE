@@ -29,6 +29,8 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 24,
     backgroundColor: '#fff',
+    // borderBottomColor:'#000',
+    // borderBottomWidth:1
   },
   logo: {
     fontSize: 22,
@@ -41,7 +43,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconMargin: {
-    marginLeft: 24,
+    paddingLeft: 24,
   },
 });
 
