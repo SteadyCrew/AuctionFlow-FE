@@ -2,19 +2,15 @@ import React, {useContext} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {AuthContext} from '../components/Auth/AuthContext';
 
-const LogInScreen = ({navigation, setIsLogin}) => {
-  const {logIn} = useContext(AuthContext); // logIn 함수 가져오기
-
-  const handleLogin = () => {
-    logIn(); // 로그인 처리
-  };
+const LogInScreen = ({navigation}) => {
+  const {logIn} = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
       <Text style={styles.logoText}>Auction FLOW</Text>
 
-      {/* 카카오 로그인 버튼 예시 */}
-      <TouchableOpacity style={styles.kakaoButton} onPress={handleLogin}>
+      {/* 카카오 로그인 버튼 */}
+      <TouchableOpacity style={styles.kakaoButton} onPress={logIn}>
         <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
       </TouchableOpacity>
 
