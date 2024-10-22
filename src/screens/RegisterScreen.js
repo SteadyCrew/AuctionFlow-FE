@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Image, StyleSheet, Alert, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Calendar } from 'react-native-calendars';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const RegisterScreen = () => {
   const [productName, setProductName] = useState('');
@@ -18,6 +18,25 @@ const RegisterScreen = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isCalendarVisible, setCalendarVisibility] = useState(false);
+  const [open, setOpen] = useState(false); // 드롭다운 열기 상태
+  const [items, setItems] = useState([
+    { label: '의류', value: 'clothing' },
+    { label: '패션 액세서리', value: 'fashion-accessories' },
+    { label: '전자기기', value: 'electronics' },
+    { label: '스포츠/레저', value: 'sports-leisure' },
+    { label: '차량/오토바이', value: 'vehicles' },
+    { label: '스타굿즈', value: 'star-goods' },
+    { label: '음반/악기', value: 'music-instruments' },
+    { label: '도서/티켓/문구', value: 'books-tickets-stationery' },
+    { label: '뷰티/미용', value: 'beauty' },
+    { label: '가구/인테리어', value: 'furniture-home' },
+    { label: '생활/주방용품', value: 'home-kitchen' },
+    { label: '공구/산업용품', value: 'tools-industrial' },
+    { label: '식품', value: 'food' },
+    { label: '유아동/출산', value: 'baby-kids' },
+    { label: '반려동물 용품', value: 'pet-supplies' },
+    { label: '기타', value: 'others' },
+  ]);
 
   const handleInputChange = (setter) => (value) => setter(value);
 
@@ -144,33 +163,20 @@ const RegisterScreen = () => {
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>카테고리</Text>
-        <Picker
-          selectedValue={category}
-          onValueChange={handleInputChange(setCategory)}
-          style={styles.picker}
-        >
-          <Picker.Item label="선택하세요" value="" />
-          <Picker.Item label="의류" value="clothing" />
-          <Picker.Item label="패션 액세서리" value="fashion-accessories" />
-          <Picker.Item label="전자기기" value="electronics" />
-          <Picker.Item label="스포츠/레저" value="sports-leisure" />
-          <Picker.Item label="차량/오토바이" value="vehicles" />
-          <Picker.Item label="스타굿즈" value="star-goods" />
-          <Picker.Item label="음반/악기" value="music-instruments" />
-          <Picker.Item label="도서/티켓/문구" value="books-tickets-stationery" />
-          <Picker.Item label="뷰티/미용" value="beauty" />
-          <Picker.Item label="가구/인테리어" value="furniture-home" />
-          <Picker.Item label="생활/주방용품" value="home-kitchen" />
-          <Picker.Item label="공구/산업용품" value="tools-industrial" />
-          <Picker.Item label="식품" value="food" />
-          <Picker.Item label="유아동/출산" value="baby-kids" />
-          <Picker.Item label="반려동물 용품" value="pet-supplies" />
-          <Picker.Item label="기타" value="others" />
-        </Picker>
+        <DropDownPicker
+          open={open}
+          value={category}
+          items={items}
+          setOpen={setOpen}
+          setValue={setCategory}
+          setItems={setItems}
+          placeholder="카테고리를 선택하세요"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
+        />
         {errors.category && <Text style={styles.errorMessage}>{errors.category}</Text>}
       </View>
       <View style={styles.separator} />
-
       <View style={styles.formGroup}>
         <Text style={styles.label}>상품 상태</Text>
         {['새 상품(미개봉)', '사용감 없음', '사용감 적음', '사용감 많음', '고장 및 파손 상품'].map((value) => (

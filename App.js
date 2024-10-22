@@ -20,8 +20,6 @@ import RegisterHeader from './src/components/Headers/RegisterHeader';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// 기존 import는 그대로 유지합니다.
-
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -103,14 +101,12 @@ function MainTabs() {
 const HomeStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Home" component={HomeScreen} options={{ header: () => <Header /> }} />
-    <Stack.Screen name="Search" component={SearchScreen} options={{ header: () => <SearchHeader /> }} />
   </Stack.Navigator>
 );
 
 const MyDealsStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="MyDeals" component={MyDealsScreen} options={{header: () => <Header /> }} />
-    <Stack.Screen name="Note" component={NoteScreen} options={{ header: () => <NoteHeader /> }} />
   </Stack.Navigator>
 );
 
@@ -148,7 +144,6 @@ function AppNavigator() {
           component={NoteScreen} 
           options={{
             header: () => <NoteHeader />, // NoteHeader 추가
-            tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
           }} 
         />
         <Stack.Screen 
@@ -156,7 +151,6 @@ function AppNavigator() {
           component={SearchScreen} 
           options={{
             header: () => <SearchHeader />, // SearchHeader 추가
-            tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
           }} 
         />
         <Stack.Screen 
@@ -164,7 +158,6 @@ function AppNavigator() {
           component={RegisterScreen} 
           options={{
             header: () => <RegisterHeader />, // RegisterHeader 추가
-            tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
           }} 
         />
       </Stack.Navigator>
