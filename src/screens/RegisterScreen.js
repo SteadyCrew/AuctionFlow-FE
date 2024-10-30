@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Image, StyleSheet, Alert, Modal } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Calendar } from 'react-native-calendars';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { Picker } from '@react-native-picker/picker';
 
 const RegisterScreen = () => {
   const [productName, setProductName] = useState('');
-  const [category, setCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("default");
   const [status, setStatus] = useState('');
   const [description, setDescription] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -124,29 +124,34 @@ const RegisterScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.formImageGroup}>
-        {productImages.length === 0 ? (
-          <TouchableOpacity onPress={handleImageChange} style={styles.imageUploadPlaceholder}>
-            <Text style={styles.uploadText}>이미지 등록</Text>
-          </TouchableOpacity>
-        ) : (
-          <ScrollView horizontal>
-            {productImages.map((image, index) => (
-              <View key={index} style={styles.imageWrapper}>
-                <Image source={{ uri: image.uri }} style={styles.image} />
-                <TouchableOpacity onPress={() => handleImageDelete(index)} style={styles.deleteButton}>
-                  <Text style={styles.deleteButtonText}>&times;</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-            <TouchableOpacity onPress={handleImageChange} style={styles.imageUploadBoxItem}>
-              <Text style={styles.uploadText}>+</Text>
+<ScrollView style={styles.container}>
+  <View style={styles.formImageGroup}>
+    {/* 이미지 등록 버튼 */}
+    <TouchableOpacity onPress={handleImageChange} style={styles.imageUploadPlaceholder}>
+      <Text style={styles.uploadText}>이미지 등록</Text>
+    </TouchableOpacity>
+
+    {/* 이미지들을 한 줄로 표시하는 수평 ScrollView */}
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={true} // 스크롤바 표시
+      style={styles.imageScrollContainer}
+    >
+      {productImages.length === 0 ? (
+        <Text style={styles.uploadText}>등록된 이미지가 없습니다.</Text>
+      ) : (
+        productImages.map((image, index) => (
+          <View key={index} style={styles.imageWrapper}>
+            <Image source={{ uri: image.uri }} style={styles.image} />
+            <TouchableOpacity onPress={() => handleImageDelete(index)} style={styles.deleteButton}>
+              <Text style={styles.deleteButtonText}>&times;</Text>
             </TouchableOpacity>
-          </ScrollView>
-        )}
-        {errors.productImages && <Text style={styles.errorMessage}>{errors.productImages}</Text>}
-      </View>
+          </View>
+        ))
+      )}
+    </ScrollView>
+  </View>
+
       <View style={styles.separator} />
 
       <View style={styles.formGroup}>
@@ -163,17 +168,28 @@ const RegisterScreen = () => {
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>카테고리</Text>
-        <DropDownPicker
-          open={open}
-          value={category}
-          items={items}
-          setOpen={setOpen}
-          setValue={setCategory}
-          setItems={setItems}
-          placeholder="카테고리를 선택하세요"
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownContainer}
-        />
+        <Picker
+        selectedValue={selectedCategory}
+        onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+      >
+        <Picker.Item label="기본" value="default" />
+        <Picker.Item label="의류" value="clothing" />
+        <Picker.Item label="패션 액세서리" value="fashion-accessories" />
+        <Picker.Item label="전자기기" value="electronics" />
+        <Picker.Item label="스포츠/레저" value="sports-leisure" />
+        <Picker.Item label="차량/오토바이" value="vehicles" />
+        <Picker.Item label="스타굿즈" value="star-goods" />
+        <Picker.Item label="음반/악기" value="music-instruments" />
+        <Picker.Item label="도서/티켓/문구" value="books-tickets-stationery" />
+        <Picker.Item label="뷰티/미용" value="beauty" />
+        <Picker.Item label="가구/인테리어" value="furniture-home" />
+        <Picker.Item label="생활/주방용품" value="home-kitchen" />
+        <Picker.Item label="공구/산업용품" value="tools-industrial" />
+        <Picker.Item label="식품" value="food" />
+        <Picker.Item label="유아동/출산" value="baby-kids" />
+        <Picker.Item label="반려동물 용품" value="pet-supplies" />
+        <Picker.Item label="기타" value="others" />
+      </Picker>
         {errors.category && <Text style={styles.errorMessage}>{errors.category}</Text>}
       </View>
       <View style={styles.separator} />
@@ -374,6 +390,14 @@ const styles = StyleSheet.create({
     borderWidth: 6,
     borderColor: '#c4c4c4',
   },
+  imageUploadContainer: {
+    flexDirection: 'column',
+    marginTop: 10,
+  },
+  imageScrollContainer: {
+    marginTop: 10, // 버튼과 이미지 사이의 공간
+    paddingVertical: 10, // 보기 좋게 하는 패딩
+  },  
   uploadText: {
     fontFamily: 'Pretendard-SemiBold',
     fontSize: 12,
