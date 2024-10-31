@@ -11,11 +11,10 @@ import SearchScreen from './src/screens/SearchScreen';
 import NoteScreen from './src/screens/NoteScreen';
 import Header from './src/components/Headers/Header';
 import SearchHeader from './src/components/Headers/SearchHeader';
+import NoteHeader from './src/components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
 import { StyleSheet, Text, View } from 'react-native';
-import NoteHeader from './src/components/Headers/NoteHeader';
-import RegisterHeader from './src/components/Headers/RegisterHeader';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -26,8 +25,8 @@ function MainTabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          ...styles.tabBar, // 기존 styles.tabBar를 그대로 사용
-          display: route.name === '등록' ? 'none' : 'flex', // 등록 화면에서는 숨기기
+          ...styles.tabBar,
+          display: route.name === '등록' ? 'none' : 'flex',
         },
         tabBarActiveTintColor: '#5DADE2',
         tabBarInactiveTintColor: '#909090',
@@ -96,8 +95,6 @@ function MainTabs() {
   );
 }
 
-
-// 스택 내비게이션을 각 탭에 추가합니다.
 const HomeStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Home" component={HomeScreen} options={{ header: () => <Header /> }} />
@@ -106,13 +103,17 @@ const HomeStack = () => (
 
 const MyDealsStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="MyDeals" component={MyDealsScreen} options={{header: () => <Header /> }} />
+    <Stack.Screen name="MyDeals" component={MyDealsScreen} options={{ header: () => <Header /> }} />
   </Stack.Navigator>
 );
 
 const RegisterStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Register" component={RegisterScreen} options={{ header: () => <RegisterHeader /> }} />
+    <Stack.Screen 
+      name="Register" 
+      component={RegisterScreen} 
+      options={{ headerShown: false }} // 헤더 숨기기
+    />
   </Stack.Navigator>
 );
 
@@ -127,8 +128,6 @@ const MypageStack = () => (
     <Stack.Screen name="Mypage" component={MypageScreen} options={{ header: () => <Header /> }} />
   </Stack.Navigator>
 );
-
-
 
 function AppNavigator() {
   return (
@@ -153,12 +152,11 @@ function AppNavigator() {
             header: () => <SearchHeader />, // SearchHeader 추가
           }} 
         />
+        {/* RegisterStack을 직접 추가하고 headerShown: false 설정 */}
         <Stack.Screen 
           name="Register" 
-          component={RegisterScreen} 
-          options={{
-            header: () => <RegisterHeader />, // RegisterHeader 추가
-          }} 
+          component={RegisterStack} // RegisterStack을 이곳에서 사용
+          options={{ headerShown: false }} // Register 헤더 숨기기
         />
       </Stack.Navigator>
     </NavigationContainer>

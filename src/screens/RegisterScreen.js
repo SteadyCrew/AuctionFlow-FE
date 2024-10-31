@@ -1,42 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, Image, StyleSheet, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, StyleSheet, Alert, Modal } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Calendar } from 'react-native-calendars';
-import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+import RegisterHeader from '../components/Headers/RegisterHeader';
 
 const RegisterScreen = () => {
+  const navigation = useNavigation(); // 네비게이션 객체 가져오기
   const [productName, setProductName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState("default");
+  const [isCategoryModalVisible, setCategoryModalVisibility] = useState(false);
   const [status, setStatus] = useState('');
   const [description, setDescription] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [price, setPrice] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [endHour, setEndHour] = useState('');
   const [endMinute, setEndMinute] = useState('');
+  const [price, setPrice] = useState('');
   const [productImages, setProductImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isCalendarVisible, setCalendarVisibility] = useState(false);
-  const [open, setOpen] = useState(false); // 드롭다운 열기 상태
-  const [items, setItems] = useState([
-    { label: '의류', value: 'clothing' },
-    { label: '패션 액세서리', value: 'fashion-accessories' },
-    { label: '전자기기', value: 'electronics' },
-    { label: '스포츠/레저', value: 'sports-leisure' },
-    { label: '차량/오토바이', value: 'vehicles' },
-    { label: '스타굿즈', value: 'star-goods' },
-    { label: '음반/악기', value: 'music-instruments' },
-    { label: '도서/티켓/문구', value: 'books-tickets-stationery' },
-    { label: '뷰티/미용', value: 'beauty' },
-    { label: '가구/인테리어', value: 'furniture-home' },
-    { label: '생활/주방용품', value: 'home-kitchen' },
-    { label: '공구/산업용품', value: 'tools-industrial' },
-    { label: '식품', value: 'food' },
-    { label: '유아동/출산', value: 'baby-kids' },
-    { label: '반려동물 용품', value: 'pet-supplies' },
-    { label: '기타', value: 'others' },
-  ]);
+  const [isHourModalVisible, setHourModalVisibility] = useState(false);
+  const [isMinuteModalVisible, setMinuteModalVisibility] = useState(false);
 
   const handleInputChange = (setter) => (value) => setter(value);
 
@@ -56,11 +41,7 @@ const RegisterScreen = () => {
   };
 
   const handleImageDelete = (index) => {
-    setProductImages((prevImages) => {
-      const newImages = [...prevImages];
-      newImages.splice(index, 1);
-      return newImages;
-    });
+    setProductImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const handleDayPress = (day) => {
@@ -71,22 +52,19 @@ const RegisterScreen = () => {
   const validateForm = () => {
     const newErrors = {};
     const now = new Date();
-
-    const endDateTime = new Date(`${endDate}T${endHour}:${endMinute}:00`);
+    const endDateTime = new Date(`${selectedDate}T${endHour}:${endMinute}:00`);
 
     if (!productName) newErrors.productName = '상품명을 입력하세요.';
-    if (!category) newErrors.category = '카테고리를 선택하세요.';
+    if (!selectedCategory || selectedCategory === "default") newErrors.category = '카테고리를 선택하세요.';
     if (!status) newErrors.status = '상품 상태를 선택하세요.';
     if (!description) newErrors.description = '설명을 입력하세요.';
     if (!price) newErrors.price = '가격을 입력하세요.';
     if (price <= 0) newErrors.price = '가격은 0보다 커야 합니다.';
-
-    if (!endDate || !endHour || !endMinute) {
-      newErrors.endDate = '종료 시간을 입력하세요.';
+    if (!selectedDate || !endHour || !endMinute) {
+      newErrors.endDate = '종료 날짜와 시간을 입력하세요.';
     } else if (endDateTime <= now) {
       newErrors.endDate = '종료 시간은 현재 시간 이후여야 합니다.';
     }
-
     if (productImages.length === 0) newErrors.productImages = '상품 이미지를 추가하세요.';
 
     setErrors(newErrors);
@@ -94,64 +72,108 @@ const RegisterScreen = () => {
   };
 
   const handleSubmit = async () => {
-    const endDateTime = new Date(`${selectedDate}T${endHour}:${endMinute}:00`);
     if (!validateForm()) {
       return;
     }
-
+  
     setLoading(true);
-
-    Alert.alert("등록 완료", "상품이 성공적으로 등록되었습니다.");
-    resetForm();
-    setLoading(false);
+    try {
+      const response = await fetch('http://3.35.1.149:8080/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          categoryId: getCategoryID(category),
+          title: productName,
+          productStatus: status,
+          description: description,
+          startingBid: parseFloat(price),
+          auctionEndTime: formatDateTime(endDate, endHour, endMinute),
+          itemBidStatus: 'active',
+          productImages,  // 이미지 URI 목록을 포함하여 전송
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text(); // 응답 내용을 텍스트로 가져오기
+        console.error('서버 오류 응답:', errorText); // 에러 로그에 출력
+        throw new Error(`서버와의 통신에 실패했습니다. 상태 코드: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      console.log('등록 성공:', result);
+      resetForm();
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('등록 실패:', error); // 에러 메시지 출력
+      Alert.alert('오류', '서버와의 통신에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setLoading(false);
+    }
   };
+  
+  
 
   const resetForm = () => {
     setProductName('');
-    setCategory('');
+    setSelectedCategory("default");
     setStatus('');
     setDescription('');
     setPrice('');
-    setEndDate('');
+    setSelectedDate('');
     setEndHour('');
     setEndMinute('');
     setProductImages([]);
     setErrors({});
   };
 
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setCategoryModalVisibility(false);
+  };
+
   const toggleCalendar = () => {
     setCalendarVisibility(!isCalendarVisible);
   };
 
+  const toggleHourModal = () => {
+    setHourModalVisibility(!isHourModalVisible);
+  };
+
+  const toggleMinuteModal = () => {
+    setMinuteModalVisibility(!isMinuteModalVisible);
+  };
+
+  const handleHourSelect = (hour) => {
+    setEndHour(hour);
+    setHourModalVisibility(false);
+  };
+
+  const handleMinuteSelect = (minute) => {
+    setEndMinute(minute);
+    setMinuteModalVisibility(false);
+  };
+
+
   return (
-<ScrollView style={styles.container}>
-  <View style={styles.formImageGroup}>
-    {/* 이미지 등록 버튼 */}
-    <TouchableOpacity onPress={handleImageChange} style={styles.imageUploadPlaceholder}>
-      <Text style={styles.uploadText}>이미지 등록</Text>
-    </TouchableOpacity>
-
-    {/* 이미지들을 한 줄로 표시하는 수평 ScrollView */}
-    <ScrollView 
-      horizontal 
-      showsHorizontalScrollIndicator={true} // 스크롤바 표시
-      style={styles.imageScrollContainer}
-    >
-      {productImages.length === 0 ? (
-        <Text style={styles.uploadText}>등록된 이미지가 없습니다.</Text>
-      ) : (
-        productImages.map((image, index) => (
-          <View key={index} style={styles.imageWrapper}>
-            <Image source={{ uri: image.uri }} style={styles.image} />
-            <TouchableOpacity onPress={() => handleImageDelete(index)} style={styles.deleteButton}>
-              <Text style={styles.deleteButtonText}>&times;</Text>
-            </TouchableOpacity>
-          </View>
-        ))
-      )}
-    </ScrollView>
-  </View>
-
+    <ScrollView style={styles.container}>
+      <RegisterHeader onDelete={resetForm} onRegister={handleSubmit}/>
+      <View style={styles.formImageGroup}>
+        <TouchableOpacity onPress={handleImageChange} style={styles.imageUploadPlaceholder}>
+          <Text style={styles.uploadText}>이미지 등록</Text>
+        </TouchableOpacity>
+        <ScrollView horizontal showsHorizontalScrollIndicator={true} style={styles.imageScrollContainer}>
+          {productImages.map((image, index) => (
+            <View key={index} style={styles.imageWrapper}>
+              <Image source={{ uri: image.uri }} style={styles.image} />
+              <TouchableOpacity onPress={() => handleImageDelete(index)} style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>&times;</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
       <View style={styles.separator} />
 
       <View style={styles.formGroup}>
@@ -159,7 +181,7 @@ const RegisterScreen = () => {
         <TextInput
           value={productName}
           onChangeText={handleInputChange(setProductName)}
-          placeholder="상품명을 입력하세요."
+          placeholder="상품명을 입력해주세요."
           style={styles.input}
         />
         {errors.productName && <Text style={styles.errorMessage}>{errors.productName}</Text>}
@@ -168,39 +190,17 @@ const RegisterScreen = () => {
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>카테고리</Text>
-        <Picker
-        selectedValue={selectedCategory}
-        onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-      >
-        <Picker.Item label="기본" value="default" />
-        <Picker.Item label="의류" value="clothing" />
-        <Picker.Item label="패션 액세서리" value="fashion-accessories" />
-        <Picker.Item label="전자기기" value="electronics" />
-        <Picker.Item label="스포츠/레저" value="sports-leisure" />
-        <Picker.Item label="차량/오토바이" value="vehicles" />
-        <Picker.Item label="스타굿즈" value="star-goods" />
-        <Picker.Item label="음반/악기" value="music-instruments" />
-        <Picker.Item label="도서/티켓/문구" value="books-tickets-stationery" />
-        <Picker.Item label="뷰티/미용" value="beauty" />
-        <Picker.Item label="가구/인테리어" value="furniture-home" />
-        <Picker.Item label="생활/주방용품" value="home-kitchen" />
-        <Picker.Item label="공구/산업용품" value="tools-industrial" />
-        <Picker.Item label="식품" value="food" />
-        <Picker.Item label="유아동/출산" value="baby-kids" />
-        <Picker.Item label="반려동물 용품" value="pet-supplies" />
-        <Picker.Item label="기타" value="others" />
-      </Picker>
+        <TouchableOpacity onPress={() => setCategoryModalVisibility(true)}>
+            <Text style = {styles.input}>{selectedCategory === "default" ? '선택해주세요' : selectedCategory}</Text>
+        </TouchableOpacity>
         {errors.category && <Text style={styles.errorMessage}>{errors.category}</Text>}
       </View>
       <View style={styles.separator} />
+      
       <View style={styles.formGroup}>
         <Text style={styles.label}>상품 상태</Text>
         {['새 상품(미개봉)', '사용감 없음', '사용감 적음', '사용감 많음', '고장 및 파손 상품'].map((value) => (
-          <TouchableOpacity 
-            key={value} 
-            onPress={() => setStatus(value)} 
-            style={styles.radioOption}
-          >
+          <TouchableOpacity key={value} onPress={() => setStatus(value)} style={styles.radioOption}>
             <View style={styles.radioCircle}>
               {status === value && <View style={styles.selectedRb} />}
             </View>
@@ -231,8 +231,8 @@ const RegisterScreen = () => {
             keyboardType="numeric"
             value={price}
             onChangeText={handleInputChange(setPrice)}
-            placeholder="가격을 입력하세요."
-            style={styles.input}
+            placeholder="가격을 입력해주세요."
+            style={styles.priceinput}
           />
           <Text style={styles.priceLabel}>원</Text>
         </View>
@@ -240,22 +240,69 @@ const RegisterScreen = () => {
       </View>
       <View style={styles.separator} />
 
+      {/* 입찰 마감 시간 */}
       <View style={styles.formGroup2}>
-        <Text style={styles.label}>종료 날짜</Text>
-        <TouchableOpacity onPress={toggleCalendar} style={styles.input}>
-          <Text>{selectedDate || '날짜 선택'}</Text>
-        </TouchableOpacity>
+        <Text style={styles.label}>입찰 마감 시간</Text>
+        <View style={styles.dateTimeContainer}>
+          <TouchableOpacity onPress={toggleCalendar} style={styles.datePicker}>
+            <Text>{selectedDate || '날짜 선택'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleHourModal} style={styles.timePicker}>
+            <Text>{endHour || '시 선택'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleMinuteModal} style={styles.timePicker}>
+            <Text>{endMinute || '분 선택'}</Text>
+          </TouchableOpacity>
+        </View>
+        {errors.endDate && <Text style={styles.errorMessage}>{errors.endDate}</Text>}
+      </View>
+      <View style={styles.separator} />
 
-        {/* 모달 UI */}
-        <Modal
-          visible={isCalendarVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={toggleCalendar}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-            <Calendar
+
+      <Modal visible={isCategoryModalVisible} transparent>
+          <View style={styles.catemodalContainer}>
+              <View style={styles.catemodalContent}>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    {[
+                      { label: '의류', value: 'clothing' },
+                      { label: '패션 액세서리', value: 'fashion-accessories' },
+                      { label: '전자기기', value: 'electronics' },
+                      { label: '스포츠/레저', value: 'sports-leisure' },
+                      { label: '차량/오토바이', value: 'vehicles' },
+                      { label: '스타굿즈', value: 'star-goods' },
+                      { label: '음반/악기', value: 'music-instruments' },
+                      { label: '도서/티켓/문구', value: 'books-tickets-stationery' },
+                      { label: '뷰티/미용', value: 'beauty' },
+                      { label: '가구/인테리어', value: 'furniture-home' },
+                      { label: '생활/주방용품', value: 'home-kitchen' },
+                      { label: '공구/산업용품', value: 'tools-industrial' },
+                      { label: '식품', value: 'food' },
+                      { label: '유아동/출산', value: 'baby-kids' },
+                      { label: '반려동물 용품', value: 'pet-supplies' },
+                      { label: '기타', value: 'others' },
+                    ].map((category) => (
+                      <TouchableOpacity
+                        key={category.value}
+                        onPress={() => handleCategorySelect(category.label)}
+                        style={styles.categoryOption}
+                      >
+                        <Text style={styles.categoryText}>{category.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+                  <TouchableOpacity onPress={() => setCategoryModalVisibility(false)} style={styles.closeButton}>
+                    <Text style={styles.closeButtonText}>닫기</Text>
+                  </TouchableOpacity>
+              </View>
+          </Modal>
+
+
+      {/* 달력 모달 */}
+      <Modal visible={isCalendarVisible} transparent>
+        <View style={styles.calmodalContainer}>
+          <View style={styles.calmodalContent}>
+          <Calendar
                 onDayPress={handleDayPress}
                 markedDates={{
                   [selectedDate]: { 
@@ -277,31 +324,48 @@ const RegisterScreen = () => {
                   textMonthFontSize: 16, // 월 텍스트 크기
                 }}
               />
-              <TouchableOpacity onPress={toggleCalendar} style={styles.closeButton}>
+          </View>
+            <TouchableOpacity onPress={toggleCalendar} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>닫기</Text>
               </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        <View style={styles.timeContainer}>
-          <TextInput
-            value={endHour}
-            onChangeText={setEndHour}
-            placeholder="HH"
-            style={styles.timeInput}
-            keyboardType="numeric"
-          />
-          <TextInput
-            value={endMinute}
-            onChangeText={setEndMinute}
-            placeholder="MM"
-            style={styles.timeInput}
-            keyboardType="numeric"
-          />
         </View>
-        {errors.endDate && <Text style={styles.errorMessage}>{errors.endDate}</Text>}
-      </View>
+      </Modal>
+
+      {/* 시간 선택 모달 */}
+      <Modal visible={isHourModalVisible} transparent>
+        <View style={styles.timemodalContainer}>
+            <View style={styles.timemodalContent}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+              {[...Array(24).keys()].map((hour) => (
+                <TouchableOpacity key={hour} onPress={() => handleHourSelect(hour.toString().padStart(2, '0'))} style={styles.timemodalItem}>
+                  <Text style={styles.timemodalText}>{hour.toString().padStart(2, '0')}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+              <TouchableOpacity onPress={toggleHourModal} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* 분 선택 모달 */}
+      <Modal visible={isMinuteModalVisible} transparent>
+        <View style={styles.timemodalContainer}>
+          <View style={styles.timemodalContent}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+              {[...Array(60).keys()].map((minute) => (
+                <TouchableOpacity key={minute} onPress={() => handleMinuteSelect(minute.toString().padStart(2, '0'))} style={styles.timemodalItem}>
+                  <Text style={styles.timemodalText}>{minute.toString().padStart(2, '0')}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+            <TouchableOpacity onPress={toggleMinuteModal} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </TouchableOpacity>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -309,30 +373,26 @@ const RegisterScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20,
     flex: 1,
     backgroundColor: '#fff',
-  },
-  formImageGroup: {
-    paddingHorizontal: 24,
-    marginBottom: 20,
-  },
+  }, // 전체화면
+
   formGroup: {
     paddingHorizontal: 24,
-    marginTop: 24,
-    marginBottom: 24,
-  },
+    marginVertical: 20,
+  }, // 상품명, 카테고리, 상품 상태, 설명, 가격
   formGroup2: {
+    marginVertical: 20,
     paddingHorizontal: 24,
-    marginTop: 24,
-    marginBottom: 80,
-  },
+    marginBottom: 40,
+  }, // 입찰 마감 시간
+
   label: {
-    fontFamily: 'Pretendard-Bold',
+    fontFamily: 'Pretendard-SemiBold',
     fontSize: 18,
     color: '#000000',
     marginBottom: 14,
-  },
+  }, // 대분류
   input: {
     borderWidth: 1,
     borderColor: '#C0C0C0',
@@ -342,33 +402,112 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Regular',
     fontSize: 14,
     backgroundColor: '#FFFFFF',
-  },
+  }, // 입력
   textArea: {
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
-    padding: 12,
     height: 160,
-    borderRadius: 10,
-    fontFamily: 'Pretendard-Regular',
-    fontSize: 14,
-    backgroundColor: '#FFFFFF',
     textAlignVertical: 'top', 
-  },  
-  picker: {
+  }, // 설명 입력
+
+  //이미지
+  formImageGroup: { // 이미지 그룹폼
+    paddingHorizontal: 24,
+    paddingTop:40,
+  },
+  imageUploadPlaceholder: { // 이미지 네모박스
+    height: 100,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    borderWidth: 4,
+    borderColor: '#c4c4c4',
+  },
+  uploadText: { // 이미지 등록 텍스트
+    fontFamily: 'Pretendard-SemiBold',
+    fontSize: 14,
+    color: '#555',
+  },
+  imageWrapper: { // 각 이미지
+    position: 'relative',
+    marginRight: 8,
+    marginTop: 8,
+  },
+  image: { // 이미지
+    width: 120,
+    height: 120,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#A3A3A3',
-    borderRadius: 10,
+  },
+  imageScrollContainer: { // 이미지 여러장 시 스크롤에 대한 스타일
+    marginBottom: 12,
+  },  
+// 이미지 삭제 버튼 스타일
+deleteButton: {
+  position: 'absolute',
+  top: -2, // 이미지 상단에서 약간 위로
+  right: -2, // 이미지 오른쪽에서 약간 바깥으로
+  backgroundColor: '#000000',
+  borderRadius: 50, // 원형으로 만들기
+  width: 22, // 원하는 원형 버튼 크기
+  height: 22, // 원하는 원형 버튼 크기
+  justifyContent: 'center', // 버튼 내 텍스트 중앙 정렬
+  alignItems: 'center', // 버튼 내 텍스트 중앙 정렬
+},
+deleteButtonText: {
+  color: '#fff',
+  fontSize: 14, // 버튼 내 텍스트 크기 조정
+},
+
+  //카테고리 모달
+  catemodalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  catemodalContent: {
+    width: '90%',
+    maxHeight: '50%', // 모달 최대 높이 제한
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+  scrollContainer: {
+    paddingHorizontal: '30%',
+  },
+  categoryOption: {
+    paddingVertical: 6,// 카테고리 별 간격
+    alignItems: 'center',
+  },
+  categoryText: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 17,
+    color : '#555',
+  },
+  closeButton: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: '#ddd',
+  },
+  closeButtonText: {
+    fontFamily: 'Pretendard-SemiBold',
+    fontSize: 14,
   },
   radioOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   radioCircle: {
-    height: 16,
-    width: 16,
+    height: 14,
+    width: 14,
     borderRadius: 10,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#909090',
     alignItems: 'center',
     justifyContent: 'center',
@@ -378,67 +517,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 10,
-    backgroundColor: '#949494',
+    backgroundColor: '#000',
   },
-  imageUploadPlaceholder: {
-    height: 100,
-    width: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    borderWidth: 6,
-    borderColor: '#c4c4c4',
-  },
-  imageUploadContainer: {
-    flexDirection: 'column',
-    marginTop: 10,
-  },
-  imageScrollContainer: {
-    marginTop: 10, // 버튼과 이미지 사이의 공간
-    paddingVertical: 10, // 보기 좋게 하는 패딩
-  },  
-  uploadText: {
-    fontFamily: 'Pretendard-SemiBold',
-    fontSize: 12,
-    color: '#555',
-  },
-  imageWrapper: {
-    position: 'relative',
-    marginRight: 8,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#A3A3A3',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: '#000000',
-    borderRadius: 15,
-    padding: 5,
-  },
-  deleteButtonText: {
-    color: '#fff',
-  },
-  imageUploadBoxItem: {
-    height: 100,
-    width: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E0E0E0',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#A3A3A3',
-  },
+
   priceLabel: {
-    position: 'absolute',
     fontFamily: 'Pretendard-SemiBold',
-    right: 10,
+    marginLeft: 15, // 입력 필드와의 간격 조정
+    right:5,
     top: 10,
     fontSize: 18,
     color: '#000',
@@ -446,11 +531,7 @@ const styles = StyleSheet.create({
   priceInputContainer: {
     flexDirection: 'row',
   },
-  timeContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  timeInput: {
+  priceinput:{
     borderWidth: 1,
     borderColor: '#C0C0C0',
     padding: 12,
@@ -459,42 +540,78 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Regular',
     fontSize: 14,
     backgroundColor: '#FFFFFF',
+    flex:1,
   },
-  errorMessage: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
+
+  //날짜 입력
+  dateTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  modalContainer: {
+  datePicker: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#C0C0C0',
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    marginRight: 10,
+  },
+  calmodalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
+  calmodalContent: {
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: 'center',
   },
-  closeButton: {
-    backgroundColor: '#5DADE2',
-    borderRadius: 20,
-    height: 30,
-    paddingHorizontal: 16,
-    marginTop: 10,
+
+  timePicker: {
+    width: 100,
+    borderWidth: 1,
+    borderColor: '#C0C0C0',
+    borderRadius: 10,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    marginRight: 10,
   },
-  closeButtonText: {
-    textAlign: 'center',
+  timemodalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  timemodalContent: {
+    width: '30%',
+    maxHeight: '60%', // 모달 최대 높이 제한
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+  timemodalItem: {
+    paddingVertical: 6,// 카테고리 별 간격
+    alignItems: 'center',
+  },
+  timemodalText: {
     fontFamily: 'Pretendard-Regular',
-    color: '#fff',
-    fontSize: 14,
-    lineHeight: 30,
-    textAlign: 'center',
+    fontSize: 17,
+    color : '#555',
+  },
+  errorMessage: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
+    fontFamily:'Pretendard-Light',
   },
   separator: {
-    height: 8,
+    height: 6,
     backgroundColor: '#F6F6F6',
   },
 });
