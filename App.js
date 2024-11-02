@@ -14,7 +14,7 @@ import SearchHeader from './src/components/Headers/SearchHeader';
 import NoteHeader from './src/components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -97,7 +97,11 @@ function MainTabs() {
 
 const HomeStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Home" component={HomeScreen} options={{ header: () => <Header /> }} />
+    <Stack.Screen 
+      name="Home" 
+      component={HomeScreen} 
+      options={{ header: () => <Header /> }} 
+    />
   </Stack.Navigator>
 );
 
@@ -141,22 +145,12 @@ function AppNavigator() {
         <Stack.Screen 
           name="Note" 
           component={NoteScreen} 
-          options={{
-            header: () => <NoteHeader />, // NoteHeader 추가
-          }} 
+          options={{ header: () => <NoteHeader /> }} 
         />
         <Stack.Screen 
           name="Search" 
           component={SearchScreen} 
-          options={{
-            header: () => <SearchHeader />, // SearchHeader 추가
-          }} 
-        />
-        {/* RegisterStack을 직접 추가하고 headerShown: false 설정 */}
-        <Stack.Screen 
-          name="Register" 
-          component={RegisterStack} // RegisterStack을 이곳에서 사용
-          options={{ headerShown: false }} // Register 헤더 숨기기
+          options={{ header: () => <SearchHeader /> }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -23,6 +23,29 @@ const RegisterScreen = () => {
   const [isHourModalVisible, setHourModalVisibility] = useState(false);
   const [isMinuteModalVisible, setMinuteModalVisibility] = useState(false);
 
+  const getCategoryID = (categoryLabel) => {
+    switch (categoryLabel) {
+      case '의류': return 1;
+      case '패션 액세서리': return 2;
+      case '전자기기': return 3;
+      case '스포츠/레저': return 4;
+      case '차량/오토바이': return 5;
+      case '스타굿즈': return 6;
+      case '음반/악기': return 7;
+      case '도서/티켓/문구': return 8;
+      case '뷰티/미용': return 9;
+      case '가구/인테리어': return 10;
+      case '생활/주방용품': return 11;
+      case '공구/산업용품': return 12;
+      case '식품': return 13;
+      case '유아동/출산': return 14;
+      case '반려동물 용품': return 15;
+      case '기타': return 16;
+      default: return 0;
+    }
+  };
+  
+
   const handleInputChange = (setter) => (value) => setter(value);
 
   const handleImageChange = async () => {
@@ -44,10 +67,22 @@ const RegisterScreen = () => {
     setProductImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  const handleCategorySelect = (label) => {
+    setSelectedCategory(label);
+    setCategoryModalVisibility(false);
+  };
+  
+
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
     setCalendarVisibility(false);
   };
+
+  const formatDateTime = (date, hour, minute) => {
+    return `${date}T${hour}:${minute}:00`;
+  };
+  
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -72,46 +107,73 @@ const RegisterScreen = () => {
   };
 
   const handleSubmit = async () => {
+    // 유효성 검사
     if (!validateForm()) {
-      return;
+      return; // 폼이 유효하지 않으면 제출하지 않음
     }
   
-    setLoading(true);
+    setLoading(true); // 로딩 상태 설정
+  
+    const formData = new FormData();
+  
+    const itemData = {
+      categoryId: getCategoryID(selectedCategory), // 올바른 ID가 반환되고 있는지 확인
+      title: productName, // 제목이 비어있지 않은지 확인
+      productStatus: status, // 상태가 올바른 값인지 확인
+      description: description, // 설명이 비어있지 않은지 확인
+      startingBid: parseFloat(price), // 숫자 형식인지 확인
+      auctionEndTime: formatDateTime(selectedDate, endHour, endMinute), // 날짜 형식이 올바른지 확인
+      itemBidStatus: 'active', // 상태가 올바른지 확인
+    };
+    
+    // FormData에 item 데이터 추가
+    formData.append('item', JSON.stringify(itemData));
+
+    // 콘솔에 itemData 출력
+    console.log('Item Data:', itemData);
+
+  
+    // 이미지 파일 추가
+    productImages.forEach((image, index) => {
+      formData.append('images', {
+        uri: image.uri,
+        type: image.type || 'image/jpeg', // 이미지 타입 지정
+        name: image.fileName || `image_${index}.jpg`, // 파일 이름 지정
+      });
+    });
+    
+    
+  
     try {
       const response = await fetch('http://3.35.1.149:8080/items', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          categoryId: getCategoryID(category),
-          title: productName,
-          productStatus: status,
-          description: description,
-          startingBid: parseFloat(price),
-          auctionEndTime: formatDateTime(endDate, endHour, endMinute),
-          itemBidStatus: 'active',
-          productImages,  // 이미지 URI 목록을 포함하여 전송
-        }),
+        body: formData,
       });
   
-      if (!response.ok) {
-        const errorText = await response.text(); // 응답 내용을 텍스트로 가져오기
-        console.error('서버 오류 응답:', errorText); // 에러 로그에 출력
-        throw new Error(`서버와의 통신에 실패했습니다. 상태 코드: ${response.status}`);
-      }
+      // 서버 응답 전체를 로그로 출력
+      console.log('Response:', response); 
+      console.log('Response status:', response.status); // 상태 코드 로그 출력
   
-      const result = await response.json();
-      console.log('등록 성공:', result);
-      resetForm();
-      navigation.navigate('Home');
+      if (response.ok) {
+        // 응답이 성공적일 경우
+        resetForm(); // 폼 리셋
+        Alert.alert('Success', 'Item has been registered successfully.'); // 성공 메시지
+        navigation.navigate('Home');
+      } else {
+        // 응답이 성공적이지 않을 경우
+        const errorData = await response.json(); // 에러 데이터 파싱
+        Alert.alert('Error', errorData.message || 'Failed to register item.'); // 에러 메시지 표시
+      }
     } catch (error) {
-      console.error('등록 실패:', error); // 에러 메시지 출력
-      Alert.alert('오류', '서버와의 통신에 실패했습니다. 다시 시도해 주세요.');
+      // 네트워크 오류 발생 시
+      console.error('Fetch error:', error); // 오류 로그 출력
+      Alert.alert('Network Error', 'Failed to connect to server.'); // 네트워크 오류 메시지
     } finally {
+      // 로딩 상태 해제
       setLoading(false);
     }
   };
+  
   
   
 
@@ -128,10 +190,6 @@ const RegisterScreen = () => {
     setErrors({});
   };
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setCategoryModalVisibility(false);
-  };
 
   const toggleCalendar = () => {
     setCalendarVisibility(!isCalendarVisible);
