@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
+import ProductScreen from './src/screens/ProductScreen';
 import MyDealsScreen from './src/screens/MyDealScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import FavScreen from './src/screens/FavScreen';
@@ -100,6 +101,11 @@ const HomeStack = () => (
     <Stack.Screen 
       name="Home" 
       component={HomeScreen} 
+      options={{ header: () => <Header /> }} 
+    />
+    <Stack.Screen 
+      name="Product" 
+      component={ProductScreen} 
       options={{ header: () => <Header /> }} 
     />
   </Stack.Navigator>
