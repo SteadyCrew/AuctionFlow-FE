@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#F0F0F0',
     borderRadius: 15,
-    height: 30, // 높이를 24로 설정
+    height: 30,
   },
   tab: {
     flex: 1,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   activeTab: {
-    backgroundColor: '#5DADE2', // 선택된 탭의 배경색
+    backgroundColor: '#5DADE2',
   },
   tabText: {
     fontSize: 12,
