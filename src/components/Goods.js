@@ -6,12 +6,15 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 const numColumns = 3;
 const windowWidth = Dimensions.get('window').width;
 
 const Goods = ({items}) => {
+  const navigation = useNavigation();
   const formatData = (items, numColumns) => {
     const totalRows = Math.floor(items.length / numColumns); // 전체 행 수 계산
     let totalLastRow = items.length - totalRows * numColumns; // 마지막 행의 아이템 수
@@ -31,9 +34,13 @@ const Goods = ({items}) => {
     }
     return (
       <View style={styles.itemContainer}>
-        <Image source={{uri: item.image}} style={styles.itemImage} />
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>{item.price}</Text>
+        <TouchableOpacity
+          style={{alignItems: 'center'}}
+          onPress={() => navigation.navigate('상품', {itemId: item.id})}>
+          <Image source={{uri: item.image}} style={styles.itemImage} />
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemPrice}>{item.price}</Text>
+        </TouchableOpacity>
       </View>
     );
   };

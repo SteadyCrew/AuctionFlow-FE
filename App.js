@@ -1,7 +1,7 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import ProductScreen from './src/screens/ProductScreen';
 import MyDealsScreen from './src/screens/MyDealScreen';
@@ -15,7 +15,7 @@ import SearchHeader from './src/components/Headers/SearchHeader';
 import NoteHeader from './src/components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
-import { StyleSheet, Text } from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -23,7 +23,7 @@ const Stack = createStackNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      screenOptions={({route}) => ({
         headerShown: false,
         tabBarStyle: {
           ...styles.tabBar,
@@ -36,11 +36,9 @@ function MainTabs() {
         name="홈"
         component={HomeStack}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Icon name="home" size={22} color={color} />
-          ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>홈</Text>
+          tabBarIcon: ({color}) => <Icon name="home" size={22} color={color} />,
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>홈</Text>
           ),
         }}
       />
@@ -48,11 +46,11 @@ function MainTabs() {
         name="찜"
         component={FavStack}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Icon name="heart" size={22} color={color} />
           ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>찜</Text>
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>찜</Text>
           ),
         }}
       />
@@ -60,23 +58,23 @@ function MainTabs() {
         name="등록"
         component={RegisterStack}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Icon2 name="plus-circle" size={22} color={color} />
           ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>등록</Text>
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>등록</Text>
           ),
         }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="내 거래"
         component={MyDealsStack}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Icon2 name="shopping-bag" size={22} color={color} />
           ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>내 거래</Text>
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>내 거래</Text>
           ),
         }}
       />
@@ -84,11 +82,23 @@ function MainTabs() {
         name="마이페이지"
         component={MypageStack}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({color}) => (
             <Icon2 name="user" size={22} color={color} />
           ),
-          tabBarLabel: ({ color }) => (
-            <Text style={[styles.label, { color }]}>마이페이지</Text>
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>마이페이지</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="상품"
+        component={ProductScreen}
+        options={{
+          tabBarIcon: ({color}) => (
+            <Icon2 name="user" size={22} color={color} />
+          ),
+          tabBarLabel: ({color}) => (
+            <Text style={[styles.label, {color}]}>마이페이지</Text>
           ),
         }}
       />
@@ -98,44 +108,56 @@ function MainTabs() {
 
 const HomeStack = () => (
   <Stack.Navigator>
-    <Stack.Screen 
-      name="Home" 
-      component={HomeScreen} 
-      options={{ header: () => <Header /> }} 
+    <Stack.Screen
+      name="Home"
+      component={HomeScreen}
+      options={{header: () => <Header />}}
     />
-    <Stack.Screen 
-      name="Product" 
-      component={ProductScreen} 
-      options={{ header: () => <Header /> }} 
+    <Stack.Screen
+      name="Product"
+      component={ProductScreen}
+      options={{header: () => <Header />}}
     />
   </Stack.Navigator>
 );
 
 const MyDealsStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="MyDeals" component={MyDealsScreen} options={{ header: () => <Header /> }} />
+    <Stack.Screen
+      name="MyDeals"
+      component={MyDealsScreen}
+      options={{header: () => <Header />}}
+    />
   </Stack.Navigator>
 );
 
 const RegisterStack = () => (
   <Stack.Navigator>
-    <Stack.Screen 
-      name="Register" 
-      component={RegisterScreen} 
-      options={{ headerShown: false }} // 헤더 숨기기
+    <Stack.Screen
+      name="Register"
+      component={RegisterScreen}
+      options={{headerShown: false}} // 헤더 숨기기
     />
   </Stack.Navigator>
 );
 
 const FavStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Favorites" component={FavScreen} options={{ header: () => <Header /> }} />
+    <Stack.Screen
+      name="Favorites"
+      component={FavScreen}
+      options={{header: () => <Header />}}
+    />
   </Stack.Navigator>
 );
 
 const MypageStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Mypage" component={MypageScreen} options={{ header: () => <Header /> }} />
+    <Stack.Screen
+      name="Mypage"
+      component={MypageScreen}
+      options={{header: () => <Header />}}
+    />
   </Stack.Navigator>
 );
 
@@ -146,17 +168,17 @@ function AppNavigator() {
         <Stack.Screen
           name="Main"
           component={MainTabs}
-          options={{ headerShown: false }} // 탭 내비게이션 숨기기
+          options={{headerShown: false}} // 탭 내비게이션 숨기기
         />
-        <Stack.Screen 
-          name="Note" 
-          component={NoteScreen} 
-          options={{ header: () => <NoteHeader /> }} 
+        <Stack.Screen
+          name="Note"
+          component={NoteScreen}
+          options={{header: () => <NoteHeader />}}
         />
-        <Stack.Screen 
-          name="Search" 
-          component={SearchScreen} 
-          options={{ header: () => <SearchHeader /> }} 
+        <Stack.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{header: () => <SearchHeader />}}
         />
       </Stack.Navigator>
     </NavigationContainer>
