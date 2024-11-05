@@ -1,5 +1,4 @@
 import React, {createContext, useState} from 'react';
-import InAppBrowser from 'react-native-inappbrowser-reborn';
 
 // AuthContext 생성
 export const AuthContext = createContext();
