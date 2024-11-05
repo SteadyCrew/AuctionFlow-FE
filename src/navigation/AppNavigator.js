@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -16,6 +16,10 @@ import NoteHeader from '../components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {StyleSheet, Text} from 'react-native';
+import RegisterHeader from '../components/Headers/RegisterHeader';
+import {AuthContext} from '../components/Auth/AuthContext';
+import SplashScreen from '../screens/SplashScreen';
+import LogInScreen from '../screens/LoginScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -162,24 +166,64 @@ const MypageStack = () => (
 );
 
 function AppNavigator() {
+  const {isLoggedIn} = useContext(AuthContext); // 로그인 상태 가져오기
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false); // 2초 후 로딩 상태 false로 변경
+    }, 2000);
+  }, []);
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Main"
-          component={MainTabs}
-          options={{headerShown: false}} // 탭 내비게이션 숨기기
-        />
-        <Stack.Screen
-          name="Note"
-          component={NoteScreen}
-          options={{header: () => <NoteHeader />}}
-        />
-        <Stack.Screen
-          name="Search"
-          component={SearchScreen}
-          options={{header: () => <SearchHeader />}}
-        />
+        {isLoading ? (
+          // 로딩 중일 때 스플래시 화면
+          <Stack.Screen
+            name="Splash"
+            component={SplashScreen}
+            options={{headerShown: false}}
+          />
+        ) : !isLoggedIn ? (
+          // 로그인하지 않았을 때 로그인 화면
+          <Stack.Screen
+            name="Login"
+            component={LogInScreen}
+            options={{headerShown: false}}
+          />
+        ) : (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainTabs}
+              options={{headerShown: false}} // 탭 내비게이션 숨기기
+            />
+            <Stack.Screen
+              name="Note"
+              component={NoteScreen}
+              options={{
+                header: () => <NoteHeader />, // NoteHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="Search"
+              component={SearchScreen}
+              options={{
+                header: () => <SearchHeader />, // SearchHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{
+                header: () => <RegisterHeader />, // RegisterHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
