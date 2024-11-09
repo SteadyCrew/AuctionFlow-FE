@@ -20,9 +20,11 @@ import RegisterHeader from '../components/Headers/RegisterHeader';
 import {AuthContext} from '../components/Auth/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 import LogInScreen from '../screens/LoginScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const AuthStack = createStackNavigator();
 
 function MainTabs() {
   return (
@@ -165,6 +167,21 @@ const MypageStack = () => (
   </Stack.Navigator>
 );
 
+const AuthNavigator = () => (
+  <AuthStack.Navigator>
+    <AuthStack.Screen
+      name="LogIn"
+      component={LogInScreen}
+      options={{headerShown: false}}
+    />
+    <AuthStack.Screen
+      name="SignUp"
+      component={SignUpScreen}
+      options={{headerShown: false}}
+    />
+  </AuthStack.Navigator>
+);
+
 function AppNavigator() {
   const {isLoggedIn} = useContext(AuthContext); // 로그인 상태 가져오기
   const [isLoading, setIsLoading] = useState(true);
@@ -174,6 +191,7 @@ function AppNavigator() {
       setIsLoading(false); // 2초 후 로딩 상태 false로 변경
     }, 2000);
   }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -185,10 +203,10 @@ function AppNavigator() {
             options={{headerShown: false}}
           />
         ) : !isLoggedIn ? (
-          // 로그인하지 않았을 때 로그인 화면
+          // 로그인하지 않았을 때 AuthNavigator 사용
           <Stack.Screen
-            name="Login"
-            component={LogInScreen}
+            name="Auth"
+            component={AuthNavigator}
             options={{headerShown: false}}
           />
         ) : (
