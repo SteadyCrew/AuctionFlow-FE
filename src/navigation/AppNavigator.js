@@ -83,18 +83,6 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="마이페이지"
-        component={MypageStack}
-        options={{
-          tabBarIcon: ({color}) => (
-            <Icon2 name="user" size={22} color={color} />
-          ),
-          tabBarLabel: ({color}) => (
-            <Text style={[styles.label, {color}]}>마이페이지</Text>
-          ),
-        }}
-      />
-      <Tab.Screen
         name="상품"
         component={ProductScreen}
         options={{
