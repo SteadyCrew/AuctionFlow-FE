@@ -1,5 +1,6 @@
 import React, {createContext, useState} from 'react';
 import axios from 'axios';
+import {BASE_URL} from '../../config/api';
 
 export const AuthContext = createContext();
 
@@ -10,7 +11,7 @@ export const AuthProvider = ({children}) => {
   // 로그인 함수
   const logIn = async (email, password) => {
     try {
-      const response = await axios.post('http://10.0.2.2:8080/user/login', {
+      const response = await axios.post(`${BASE_URL}/user/login`, {
         email,
         password,
       });
