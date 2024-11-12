@@ -8,13 +8,19 @@ import {
 } from 'react-native';
 import {AuthContext} from '../components/Auth/AuthContext';
 
-const LogInScreen = ({navigation}) => {
-  const {logIn} = useContext(AuthContext);
+const SignUpScreen = ({navigation}) => {
+  const {signUp} = useContext(AuthContext);
   const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    logIn(email, password); // 이메일과 비밀번호를 logIn 함수에 전달
+  const handleSignUp = async () => {
+    const isSuccess = await signUp(email, nickname, password); // 회원가입 성공 여부 확인
+    if (isSuccess) {
+      navigation.navigate('LogIn'); // 회원가입 성공 시 로그인 화면으로 이동
+    } else {
+      console.error('회원가입 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -32,6 +38,16 @@ const LogInScreen = ({navigation}) => {
         autoCapitalize="none"
       />
 
+      {/* 닉네임 입력 필드 */}
+      <TextInput
+        style={styles.input}
+        placeholder="닉네임"
+        placeholderTextColor="#909090"
+        value={nickname}
+        onChangeText={setNickname}
+        autoCapitalize="none"
+      />
+
       {/* 비밀번호 입력 필드 */}
       <TextInput
         style={styles.input}
@@ -43,20 +59,18 @@ const LogInScreen = ({navigation}) => {
         autoCapitalize="none"
       />
 
-      {/* 로그인 버튼 */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>로그인</Text>
+      {/* 회원가입 버튼 */}
+      <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+        <Text style={styles.signUpButtonText}>회원가입</Text>
       </TouchableOpacity>
 
-      {/* 회원가입 및 로그인 안내 문구 */}
       <Text style={styles.subText}>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text
-            style={[styles.subText, {color: '#5DADE2', fontWeight: 'bold'}]}>
-            회원가입
-          </Text>
-        </TouchableOpacity>{' '}
-        및 로그인 후 이용이 가능합니다.
+        이미 계정이 있으신가요?{' '}
+        <Text
+          style={styles.linkText}
+          onPress={() => navigation.navigate('LogInScreen')}>
+          로그인
+        </Text>
       </Text>
     </View>
   );
@@ -84,7 +98,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#F5F5F5',
   },
-  loginButton: {
+  signUpButton: {
     backgroundColor: '#5DADE2',
     padding: 15,
     borderRadius: 8,
@@ -93,7 +107,7 @@ const styles = StyleSheet.create({
     width: '80%',
     marginTop: 20,
   },
-  loginButtonText: {
+  signUpButtonText: {
     fontSize: 18,
     color: '#FFF',
   },
@@ -102,6 +116,10 @@ const styles = StyleSheet.create({
     color: '#909090',
     fontSize: 14,
   },
+  linkText: {
+    color: '#5DADE2',
+    fontWeight: 'bold',
+  },
 });
 
-export default LogInScreen;
+export default SignUpScreen;

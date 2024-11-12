@@ -1,55 +1,63 @@
 import React, {createContext, useState} from 'react';
+import axios from 'axios';
 
-// AuthContext 생성
 export const AuthContext = createContext();
 
-// AuthProvider: 로그인 상태 및 로그인/로그아웃 함수 제공
 export const AuthProvider = ({children}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null); // JWT 토큰을 저장할 상태
 
-  const logIn = async () => {
-    setIsLoggedIn(true);
+  // 로그인 함수
+  const logIn = async (email, password) => {
+    try {
+      const response = await axios.post('http://10.0.2.2:8080/user/login', {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        console.log('로그인 성공:', response.data);
+        setIsLoggedIn(true);
+        setToken(response.data.token);
+      } else {
+        console.error('로그인 실패:', response.data);
+      }
+    } catch (error) {
+      console.error('로그인 중 오류 발생:', error);
+    }
   };
-  // try {
-  // if (await InAppBrowser.isAvailable()) {
-  //   const result = await InAppBrowser.open(
-  //     'http://3.35.1.149:8080/oauth2/authorization/kakao',
-  //     {
-  //       // InAppBrowser 설정
-  //       dismissButtonStyle: 'cancel',
-  //       preferredBarTintColor: '#FEE500',
-  //       preferredControlTintColor: 'white',
-  //       readerMode: false,
-  //       showTitle: true,
-  //       toolbarColor: '#FEE500',
-  //       secondaryToolbarColor: 'black',
-  //       enableUrlBarHiding: true,
-  //       enableDefaultShare: false,
-  //       forceCloseOnRedirection: false,
-  //     },
-  //   );
-  //
-  //   console.log(result);
-  //
-  //   // 로그인 성공 시 처리
-  //   if (result.type === 'success' && result.url.includes('success')) {
-  //     setIsLoggedIn(true);
-  // 추가적인 로직 처라
-  //     }
-  //   } else {
-  //     console.error('InAppBrowser 사용 불가');
-  //   }
-  // } catch (error) {
-  //   console.error('로그인 오류:', error);
-  // }
-  // };
 
+  // 회원가입 함수
+  const signUp = async (email, nickname, password) => {
+    try {
+      const response = await axios.post('http://10.0.2.2:8080/user/register', {
+        email,
+        nickname,
+        password,
+      });
+
+      if (response.status === 201) {
+        console.log('회원가입 성공:', response.data);
+        // 회원가입 후 자동 로그인 또는 다른 처리
+        setToken(response.data.token); // 서버가 토큰을 반환하는 경우 저장
+        return true;
+      } else {
+        console.error('회원가입 실패:', response.data);
+      }
+    } catch (error) {
+      console.error('회원가입 중 오류 발생:', error);
+    }
+    return false;
+  };
+
+  // 로그아웃 함수
   const logOut = () => {
     setIsLoggedIn(false);
+    setToken(null); // 로그아웃 시 토큰 초기화
   };
 
   return (
-    <AuthContext.Provider value={{isLoggedIn, logIn, logOut}}>
+    <AuthContext.Provider value={{isLoggedIn, logIn, logOut, signUp, token}}>
       {children}
     </AuthContext.Provider>
   );
