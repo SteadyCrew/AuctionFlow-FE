@@ -9,6 +9,7 @@ const ProductScreen = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bids, setBids] = useState([]);
   const [bidAmount, setBidAmount] = useState('');
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -30,6 +31,21 @@ const ProductScreen = () => {
     };
 
     fetchProductDetails(); // 이 부분이 추가되어야 합니다.
+  }, [itemId]);
+
+
+  useEffect(() => {
+    const fetchBids = async () => {
+      try {
+        const response = await axios.get(`http://3.35.1.149:8080/auction/bids/${itemId}`);
+        setBids(Array.isArray(response.data) ? response.data : []); // 배열로 설정
+      } catch (error) {
+        console.error('Failed to fetch bids:', error);
+        setBids([]); // 에러 발생 시 빈 배열로 초기화
+      }
+    };
+  
+    fetchBids();
   }, [itemId]);
 
   const handleBidSubmit = async () => {
@@ -126,6 +142,23 @@ const ProductScreen = () => {
       </View>
 
       <View style={styles.separator} />
+
+      <View style={styles.recentPriceContainer}>
+        <Text style={styles.recentPriceHeader}>최근 제시가</Text>
+        {bids.length > 0 ? (
+          <View style={styles.recentPrice}>
+            {bids.map((bid) => (
+              <View key={bid.bidId} style={styles.bidItem}>
+                <Text>{bid.bidAmount.toLocaleString()}원</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.recentPrice}>입찰 금액이 아직 존재하지 않습니다.</Text>
+        )}
+      </View>
+
+
       
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
