@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     margin: 5,
     alignItems: 'center',
     borderRadius: 5,
+    paddingTop: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.1,
@@ -83,8 +84,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   itemImage: {
-    width: windowWidth / numColumns - 20, // 이미지 너비
-    height: 100, // 이미지 높이
+    width: windowWidth / (numColumns + 2), // 이미지 너비
+    height: 95, // 이미지 높이
     resizeMode: 'cover', // 이미지 비율 유지
   },
   itemTitle: {

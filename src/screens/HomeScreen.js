@@ -1,118 +1,55 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import axios from 'axios';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
-
-const data = {
-  랭킹: [
-    {
-      id: 1,
-      title: '상품 1',
-      price: '₩270,000',
-      image: 'https://example.com/image1.jpg',
-    },
-    {
-      id: 2,
-      title: '상품 2',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 7,
-      title: '상품 2',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 8,
-      title: '상품 2',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 1,
-      title: '상품 1',
-      price: '₩270,000',
-      image: 'https://example.com/image1.jpg',
-    },
-    {
-      id: 2,
-      title: '상품 222',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 7,
-      title: '상품 1234',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 8,
-      title: '상품 123',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 7,
-      title: '상품 1234',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-    {
-      id: 8,
-      title: '상품 123',
-      price: '₩280,000',
-      image: 'https://example.com/image2.jpg',
-    },
-  ],
-  전체목록: [
-    {
-      id: 3,
-      title: '상품 3',
-      price: '₩290,000',
-      image: 'https://example.com/image3.jpg',
-    },
-    {
-      id: 4,
-      title: '상품 4',
-      price: '₩300,000',
-      image: 'https://example.com/image4.jpg',
-    },
-  ],
-  판매목록: [
-    {
-      id: 5,
-      title: '상품 5',
-      price: '₩310,000',
-      image: 'https://example.com/image5.jpg',
-    },
-    {
-      id: 6,
-      title: '상품 6',
-      price: '₩320,000',
-      image: 'https://example.com/image6.jpg',
-    },
-  ],
-};
+import {BASE_URL} from '../config/api';
 
 const HomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 컴포넌트가 렌더링될 때 로그 찍기
+  // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
   useEffect(() => {
-    console.log('컴포넌트가 렌더링됨. 선택된 탭:', selectedTab);
-    setItems(data[selectedTab]); // 선택된 탭에 따라 아이템을 업데이트합니다.
-  }, [selectedTab]);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/items`); // localhost 대신 IP 주소 사용
+        const data = response.data;
+
+        // 가져온 데이터를 원하는 구조로 변환
+        const formattedItems = data.map(item => ({
+          id: item.itemId,
+          image:
+            item.productImageUrls[0] ||
+            'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 이미지가 없을 경우 기본 이미지 사용
+          // 현재 인터넷 이미지 주소를 사용 AWS에 새로운 default 이미지 생성 필요
+          title: item.title,
+          price: `₩${item.startingBid.toLocaleString()}`, // 가격에 통화 기호 추가
+        }));
+
+        setItems(formattedItems);
+      } catch (error) {
+        console.error('데이터 가져오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleTabPress = tab => {
-    console.log(`handleTabPress 함수 호출됨. 선택된 탭: ${tab}`); // 탭 선택 시 호출 여부 확인
+    console.log(`handleTabPress 함수 호출됨. 선택된 탭: ${tab}`);
     setSelectedTab(tab);
   };
 
   const renderContent = () => {
-    console.log(`선택된 탭: ${selectedTab}`); // 선택된 탭에 따라 내용을 표시하기 전 로그 찍기
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+    console.log(`선택된 탭: ${selectedTab}`);
     switch (selectedTab) {
       case '랭킹':
         return (
@@ -142,7 +79,6 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* 탭 위에 여백을 추가 */}
       <View style={styles.tabContainer}>
         <HomeTab
           tabs={['랭킹', '전체목록', '판매목록']}
