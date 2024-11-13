@@ -25,7 +25,7 @@ const HomeScreen = () => {
             'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 이미지가 없을 경우 기본 이미지 사용
           // 현재 인터넷 이미지 주소를 사용 AWS에 새로운 default 이미지 생성 필요
           title: item.title,
-          price: `₩${item.startingBid.toLocaleString()}`, // 가격에 통화 기호 추가
+          price: `${item.startingBid.toLocaleString()}원`, // 가격에 통화 기호 추가
         }));
 
         setItems(formattedItems);
@@ -94,18 +94,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
   },
   tabContainer: {
     paddingTop: 8,
+    paddingHorizontal: 24,
   },
   contentContainer: {
     paddingTop: 18,
   },
   text: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#000',
     fontFamily: 'Pretendard-Bold',
+    paddingHorizontal: 24,
   },
 });
 

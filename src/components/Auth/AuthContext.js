@@ -31,7 +31,7 @@ export const AuthProvider = ({children}) => {
   // 회원가입 함수
   const signUp = async (email, nickname, password) => {
     try {
-      const response = await axios.post('http://10.0.2.2:8080/user/register', {
+      const response = await axios.post(`${BASE_URL}/user/register`, {
         email,
         nickname,
         password,
