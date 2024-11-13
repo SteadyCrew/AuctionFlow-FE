@@ -60,7 +60,6 @@ const Goods = ({items}) => {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingTop: 18,
     paddingBottom: 100,
     paddingHorizontal: 24,
   },
