@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, StyleSheet, Alert, Modal } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
 import RegisterHeader from '../components/Headers/RegisterHeader';
+import { AuthContext } from '../components/Auth/AuthContext';
 
 const RegisterScreen = () => {
   const navigation = useNavigation(); // 네비게이션 객체 가져오기
@@ -22,6 +23,7 @@ const RegisterScreen = () => {
   const [isCalendarVisible, setCalendarVisibility] = useState(false);
   const [isHourModalVisible, setHourModalVisibility] = useState(false);
   const [isMinuteModalVisible, setMinuteModalVisibility] = useState(false);
+  const { token } = useContext(AuthContext); 
 
   const getCategoryID = (categoryLabel) => {
     switch (categoryLabel) {
@@ -148,6 +150,9 @@ const RegisterScreen = () => {
       const response = await fetch('http://3.35.1.149:8080/items', {
         method: 'POST',
         body: formData,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 추가
       });
   
       // 서버 응답 전체를 로그로 출력

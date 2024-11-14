@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, Button, ScrollView, ActivityIndicator, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import { AuthContext } from '../components/Auth/AuthContext';
 
 const ProductScreen = () => {
   const route = useRoute();
@@ -13,6 +14,7 @@ const ProductScreen = () => {
   const [bidAmount, setBidAmount] = useState('');
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { token } = useContext(AuthContext); 
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -34,51 +36,65 @@ const ProductScreen = () => {
   }, [itemId]);
 
 
-  useEffect(() => {
-    const fetchBids = async () => {
-      try {
-        const response = await axios.get(`http://3.35.1.149:8080/auction/bids/${itemId}`);
-        setBids(Array.isArray(response.data) ? response.data : []); // 배열로 설정
-      } catch (error) {
-        console.error('Failed to fetch bids:', error);
-        setBids([]); // 에러 발생 시 빈 배열로 초기화
-      }
-    };
-  
-    fetchBids();
-  }, [itemId]);
-
   const handleBidSubmit = async () => {
-    if (bidError) {
+  
+    if (bidError || !bidAmount) {
       Alert.alert("입찰 금액이 유효하지 않습니다.");
       return;
     }
+  
     try {
-      await axios.post(`http://3.35.1.149:8080/auction/bid`, null, {
-        // 필요한 경우 추가 설정을 할 수 있습니다.
-      });
+      const response = await axios.post(
+        `http://3.35.1.149:8080/auction/bid`,
+        {
+          itemId,
+          bidAmount: parseInt(bidAmount, 10),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 추가
+        }
+      );
       Alert.alert("입찰이 성공적으로 완료되었습니다.");
       setBidAmount('');
       setBidError('');
     } catch (error) {
-      Alert.alert(error.response?.data || "입찰에 실패했습니다.");
+      console.error("입찰 실패 에러: ", error);  // 에러 콘솔 로그 추가
+      if (error.response) {
+        // 서버에서 응답을 받았을 때
+        console.error("응답 오류:", error.response);
+        Alert.alert(error.response?.data || "입찰에 실패했습니다.");
+      } else if (error.request) {
+        // 요청이 보내졌지만 응답이 없을 때
+        console.error("요청 오류:", error.request);
+        Alert.alert("서버 응답이 없습니다. 다시 시도해주세요.");
+      } else {
+        // 다른 오류 발생 시
+        console.error("에러 메시지:", error.message);
+        Alert.alert("입찰에 실패했습니다.");
+      }
     }
   };
-
+  
+  
+  // 입찰 금액 유효성 검사 함수
   const validateBidAmount = (value) => {
     const parsedBidAmount = parseInt(value, 10);
+    
+    // 숫자가 아니거나 100의 배수가 아니면 오류 메시지 설정
     if (isNaN(parsedBidAmount) || parsedBidAmount % 100 !== 0) {
       setBidError("입찰 금액은 100원 단위로 가능합니다.");
     } else {
       setBidError('');
     }
   };
-
+  
+  // 입찰 금액 변화 처리
   const handleBidAmountChange = (value) => {
-    const sanitizedValue = value.replace(/[^0-9]/g, '');
+    const sanitizedValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
     setBidAmount(sanitizedValue);
-    validateBidAmount(sanitizedValue);
+    validateBidAmount(sanitizedValue); // 유효성 검사
   };
+  
 
   const handleNextImage = () => {
     if (product && product.productImageUrls && product.productImageUrls.length > 1) {
@@ -142,23 +158,6 @@ const ProductScreen = () => {
       </View>
 
       <View style={styles.separator} />
-
-      <View style={styles.recentPriceContainer}>
-        <Text style={styles.recentPriceHeader}>최근 제시가</Text>
-        {bids.length > 0 ? (
-          <View style={styles.recentPrice}>
-            {bids.map((bid) => (
-              <View key={bid.bidId} style={styles.bidItem}>
-                <Text>{bid.bidAmount.toLocaleString()}원</Text>
-              </View>
-            ))}
-          </View>
-        ) : (
-          <Text style={styles.recentPrice}>입찰 금액이 아직 존재하지 않습니다.</Text>
-        )}
-      </View>
-
-
       
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
@@ -289,15 +288,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     backgroundColor: '#FFFFFF',
   },
-
   button: {
     borderRadius: 50,
+    padding: 6,
     width: '18%',
     alignItems: 'center',
     backgroundColor: '#5DADE2',
   },
   buttonText: {
-    fontFamily: 'Pretendard-Regular',
+    fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
     textAlign: 'center',
   },
@@ -305,7 +304,6 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 4,
   },
-
   separator: {
     height: 6,
     backgroundColor: '#F6F6F6',
