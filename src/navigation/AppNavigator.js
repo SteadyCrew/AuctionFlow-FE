@@ -21,6 +21,8 @@ import {AuthContext} from '../components/Auth/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 import LogInScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import AddressScreen from '../screens/AddressScreen';
+import AddressHeader from '../components/Headers/AddressHeader';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -210,6 +212,14 @@ function AppNavigator() {
               options={{
                 header: () => <NoteHeader />, // NoteHeader 추가
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="AddressScreen"
+              component={AddressScreen}
+              options={{
+                header: () => <AddressHeader />,  // AddressScreen에만 별도의 헤더 사용
+                tabBarStyle: { display: 'none' },  // 탭 메뉴 숨기기
               }}
             />
             <Stack.Screen
