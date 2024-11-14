@@ -1,26 +1,46 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { AuthContext } from '../components/Auth/AuthContext';
 
 const MypageScreen = () => {
+  const { nickname } = useContext(AuthContext);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>마이페이지</Text>
+
+      <View style = {styles.info}>
+      <Text style={styles.nickname}>닉네임{nickname}</Text>
+      </View>
+
+      <View style={styles.separator} />
+
     </View>
+
+
+    
   );
 };
 
+
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 24,
-      paddingTop: 10
-    },
-    text: {
-      fontSize: 18,
-      color: '#000',
-      fontFamily: 'Pretendard-Bold',
-    },
-});
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  info: {
+    paddingHorizontal: 24,
+    marginTop: 18,
+    marginBottom: 18,
+  },
+  nickname: {
+    fontSize: 18,
+    color: '#000',
+    fontFamily: 'Pretendard-SemiBold',
+  },
+  separator: {
+    height: 6,
+    backgroundColor: '#F6F6F6',
+  },
+}); 
 
 export default MypageScreen;
