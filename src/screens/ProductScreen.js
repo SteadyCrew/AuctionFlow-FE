@@ -22,7 +22,6 @@ const ProductScreen = () => {
       setError(null);
       try {
         const response = await axios.get(`http://3.35.1.149:8080/items/${itemId}`, {
-          // 필요한 경우 추가 설정을 할 수 있습니다.
         });
         setProduct(response.data);
       } catch (error) {
@@ -32,37 +31,86 @@ const ProductScreen = () => {
       }
     };
 
-    fetchProductDetails(); // 이 부분이 추가되어야 합니다.
+    fetchProductDetails(); 
   }, [itemId]);
 
+  useEffect(() => {
+    const fetchBids = async () => {
+      try {
+        const response = await axios.get(
+          `http://3.35.1.149:8080/auction/bids/${itemId}`, // 상품 아이디에 해당하는 입찰 내역 요청
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // 인증 토큰 추가
+            },
+          }
+        );
+        
+        // 입찰 내역을 최신 순으로 정렬 (내림차순)
+        const sortedBids = response.data.sort((a, b) => b.bidId - a.bidId);
+        setBids(sortedBids);
+      } catch (error) {
+        console.error("입찰 내역 불러오기 실패:", error);
+        if (error.response) {
+          if (error.response.status === 403) {
+            Alert.alert("권한이 없습니다. 다시 로그인 해주세요.");
+          } else {
+            Alert.alert("입찰 내역을 불러오지 못했습니다.");
+          }
+        }
+      }
+    };
+  
+    fetchBids(); // fetchBids 함수 호출
+  }, [itemId, token]); // itemId나 token이 변경될 때마다 호출
+  
+  
+  
 
   const handleBidSubmit = async () => {
-  
+    // 입찰 금액 유효성 검사
     if (bidError || !bidAmount) {
       Alert.alert("입찰 금액이 유효하지 않습니다.");
+      return;
+    }
+  
+    // 토큰이 없는 경우 체크
+    if (!token) {
+      Alert.alert("로그인이 필요합니다.");
       return;
     }
   
     try {
       const response = await axios.post(
         `http://3.35.1.149:8080/auction/bid`,
+        null,  // 데이터 본문은 비어있으므로 null로 설정
         {
-          itemId,
-          bidAmount: parseInt(bidAmount, 10),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 추가
+          params: {
+            itemId,
+            bidAmount: parseInt(bidAmount, 10),
+          },
+          headers: {
+            Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
+          },
         }
       );
+  
       Alert.alert("입찰이 성공적으로 완료되었습니다.");
-      setBidAmount('');
-      setBidError('');
+      setBidAmount(''); // 입력 필드 초기화
+      setBidError(''); // 오류 메시지 초기화
     } catch (error) {
-      console.error("입찰 실패 에러: ", error);  // 에러 콘솔 로그 추가
+      console.error("입찰 실패 에러: ", error);
+  
       if (error.response) {
         // 서버에서 응답을 받았을 때
         console.error("응답 오류:", error.response);
-        Alert.alert(error.response?.data || "입찰에 실패했습니다.");
+  
+        // 403 오류에 대한 세부 메시지 처리
+        if (error.response.status === 403) {
+          Alert.alert("권한이 없습니다. 다시 시도해 주세요.");
+        } else {
+          Alert.alert(error.response?.data?.message || "입찰에 실패했습니다.");
+        }
       } else if (error.request) {
         // 요청이 보내졌지만 응답이 없을 때
         console.error("요청 오류:", error.request);
@@ -74,6 +122,8 @@ const ProductScreen = () => {
       }
     }
   };
+  
+  
   
   
   // 입찰 금액 유효성 검사 함수
@@ -158,6 +208,35 @@ const ProductScreen = () => {
       </View>
 
       <View style={styles.separator} />
+
+      <View style={styles.bidContainer}>
+        <Text style={styles.bidLabel}>최근 제시가</Text>
+          {bids.length > 0 ? (
+            <View style={styles.recentPrice}>
+              {bids
+                .map((bid, index) => (
+                  <View
+                    key={bid.bidId}
+                    style={[
+                      styles.bidBlock,
+                      index === 0 && styles.recentBid, // 가장 최근 입찰에 스타일 적용
+                    ]}
+                  >
+                    <Text style={styles.bidAmount}>
+                      {bid.bidAmount.toLocaleString()}원
+                    </Text>
+                  </View>
+                ))}
+            </View>
+          ) : (
+            <Text style={styles.noBids}>입찰 금액이 아직 존재하지 않습니다.</Text>
+          )}
+
+
+      </View>
+
+
+    <View style={styles.separator} />
       
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
@@ -270,9 +349,33 @@ const styles = StyleSheet.create({
   },
   bidLabel: {
     fontFamily: 'Pretendard-SemiBold',
-    fontSize: 16,
+    fontSize: 18,
     color:'#000',
     marginBottom : 8,
+  },
+  bidAmount: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize:16,
+    color:'#000',
+  },
+  recentPrice: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',         // 여러 줄로 자동 배치되게 함
+    justifyContent: 'space-between', // 항목 사이에 공간을 고르게 배치
+  },
+  recentBid: {
+    borderColor: '#5DADE2', // 가장 최근 입찰의 테두리 색
+    borderWidth: 1.5, // 테두리 두께
+    backgroundColor: '#f9f9f9',
+  },
+  bidBlock: {
+    width: '48%',            // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
+    padding: 10,
+    marginBottom: 8,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   bidInputContainer: {
     flexDirection: 'row',
