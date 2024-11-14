@@ -36,7 +36,7 @@ const Goods = ({items}) => {
       <View style={styles.itemContainer}>
         <TouchableOpacity
           style={{alignItems: 'center'}}
-          onPress={() => navigation.navigate('상품', {itemId: item.id})}>
+          onPress={() => navigation.navigate('Product', {itemId: item.id})}>
           <Image source={{uri: item.image}} style={styles.itemImage} />
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemPrice}>{item.price}</Text>
