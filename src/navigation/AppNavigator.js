@@ -23,6 +23,7 @@ import LogInScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import AddressScreen from '../screens/AddressScreen';
 import AddressHeader from '../components/Headers/AddressHeader';
+import AddressSearchScreen from '../screens/AddressSearchScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -238,7 +239,16 @@ function AppNavigator() {
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
               }}
             />
-            
+            {/* AddressSearchScreen 등록 */}
+            <Stack.Screen
+              name="AddressSearch"
+              component={AddressSearchScreen}
+              options={{
+                header: () => <AddressHeader />,
+                tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
+              }}
+            />
+
           </>
         )}
       </Stack.Navigator>
