@@ -9,9 +9,9 @@ import RegisterScreen from '../screens/RegisterScreen';
 import FavScreen from '../screens/FavScreen';
 import MypageScreen from '../screens/MypageScreen';
 import SearchScreen from '../screens/SearchScreen';
+import SearchResultScreen from '../screens/SearchResultScreen';
 import NoteScreen from '../screens/NoteScreen';
 import Header from '../components/Headers/Header';
-import SearchHeader from '../components/Headers/SearchHeader';
 import NoteHeader from '../components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
@@ -24,6 +24,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import AddressScreen from '../screens/AddressScreen';
 import AddressHeader from '../components/Headers/AddressHeader';
 import AddressSearchScreen from '../screens/AddressSearchScreen';
+import SearchHeader from '../components/Headers/SearchHeader';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -226,10 +227,14 @@ function AppNavigator() {
             <Stack.Screen
               name="Search"
               component={SearchScreen}
+              options={{ headerShown: false }} // SearchScreen에서 헤더 숨기기
+            />
+            <Stack.Screen
+              name="SearchResult"
+              component={SearchResultScreen}
               options={{
-                header: () => <SearchHeader />, // SearchHeader 추가
-                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
-              }}
+                header: () => <SearchHeader />,
+              }} // SearchResultScreen에서 헤더 표시
             />
             <Stack.Screen
               name="Register"
