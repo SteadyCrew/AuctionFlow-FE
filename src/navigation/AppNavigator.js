@@ -202,6 +202,38 @@ function AppNavigator() {
               component={MainTabs}
               options={{headerShown: false}}
             />
+            <Stack.Screen
+              name="Note"
+              component={NoteScreen}
+              options={{
+                header: () => <NoteHeader />, // NoteHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="AddressScreen"
+              component={AddressScreen}
+              options={{
+                header: () => <AddressHeader />,  // AddressScreen에만 별도의 헤더 사용
+                tabBarStyle: { display: 'none' },  // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="AddressSearch"
+              component={AddressSearchScreen}
+              options={{
+                header: () => <AddressHeader />,
+                tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="Search"
+              component={SearchScreen}
+              options={{
+                header: () => <SearchHeader />, // SearchHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
             {/* ProductScreen 별도 관리 */}
             <Stack.Screen
               name="Product"
