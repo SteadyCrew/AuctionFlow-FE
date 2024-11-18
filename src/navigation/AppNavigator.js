@@ -17,7 +17,6 @@ import NoteHeader from '../components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {StyleSheet, Text} from 'react-native';
-import RegisterHeader from '../components/Headers/RegisterHeader';
 import {AuthContext} from '../components/Auth/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 import LogInScreen from '../screens/LoginScreen';
@@ -230,7 +229,15 @@ function AppNavigator() {
               name="Search"
               component={SearchScreen}
               options={{
-                header: () => <SearchHeader />, // SearchHeader 추가
+                headerShown: false, // SearchHeader 추가
+                tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="SearchResult"
+              component={SearchResultScreen}
+              options={{
+                header: () => <SearchHeader />,
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
               }}
             />
