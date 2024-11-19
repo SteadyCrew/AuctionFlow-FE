@@ -44,12 +44,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
     paddingTop: 10,
   },
   text: {
     fontSize: 18,
     color: '#000',
+    paddingHorizontal: 24,
     fontFamily: 'Pretendard-Bold',
   },
 });

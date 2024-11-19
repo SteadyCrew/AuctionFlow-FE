@@ -49,7 +49,7 @@ const MypageScreen = () => {
         />
         <View style={styles.InfoContainer}>
           <Text style={styles.nickname}>
-            {nickname} tmrkal 님,{' '}
+            {nickname} 님,
           </Text>
           <Text style={styles.greetings}>환영합니다!</Text>
         </View>
