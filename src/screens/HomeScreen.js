@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import axios from 'axios';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
-import {BASE_URL} from '../config/api';
+import {fetchData} from '../components/api';
 
 const HomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
@@ -36,7 +35,7 @@ const HomeScreen = () => {
       }
     };
 
-    fetchData();
+    loadItems();
   }, []);
 
   const handleTabPress = tab => {

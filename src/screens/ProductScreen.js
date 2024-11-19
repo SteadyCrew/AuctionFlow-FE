@@ -1,12 +1,25 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, Button, ScrollView, ActivityIndicator, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import React, {useState, useEffect, useContext} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  Button,
+  ScrollView,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
-import { AuthContext } from '../components/Auth/AuthContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {AuthContext} from '../components/Auth/AuthContext';
 
 const ProductScreen = () => {
+  const {token} = useContext(AuthContext);
   const route = useRoute();
-  const { itemId } = route.params; 
+  const {itemId} = route.params;
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,6 +27,7 @@ const ProductScreen = () => {
   const [bidAmount, setBidAmount] = useState('');
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
   const { token } = useContext(AuthContext); 
 
   useEffect(() => {
@@ -132,7 +146,7 @@ const ProductScreen = () => {
     
     // 숫자가 아니거나 100의 배수가 아니면 오류 메시지 설정
     if (isNaN(parsedBidAmount) || parsedBidAmount % 100 !== 0) {
-      setBidError("입찰 금액은 100원 단위로 가능합니다.");
+      setBidError('입찰 금액은 100원 단위로 가능합니다.');
     } else {
       setBidError('');
     }
@@ -147,14 +161,69 @@ const ProductScreen = () => {
   
 
   const handleNextImage = () => {
-    if (product && product.productImageUrls && product.productImageUrls.length > 1) {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % product.productImageUrls.length);
+    if (
+      product &&
+      product.productImageUrls &&
+      product.productImageUrls.length > 1
+    ) {
+      setCurrentImageIndex(
+        prevIndex => (prevIndex + 1) % product.productImageUrls.length,
+      );
     }
   };
 
   const handlePrevImage = () => {
-    if (product && product.productImageUrls && product.productImageUrls.length > 1) {
-      setCurrentImageIndex((prevIndex) => (prevIndex - 1 + product.productImageUrls.length) % product.productImageUrls.length);
+    if (
+      product &&
+      product.productImageUrls &&
+      product.productImageUrls.length > 1
+    ) {
+      setCurrentImageIndex(
+        prevIndex =>
+          (prevIndex - 1 + product.productImageUrls.length) %
+          product.productImageUrls.length,
+      );
+    }
+  };
+
+  const handleFavorite = async () => {
+    try {
+      if (!token) {
+        console.error('Token이 없습니다.'); // 토큰이 없으면 요청하지 않음
+        Alert.alert('로그인이 필요합니다.');
+        return;
+      }
+
+      if (isFavorited) {
+        // DELETE 요청
+        await axios.delete(
+          `http://3.35.1.149:8080/mypage/like`, // endpoint
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Bearer 토큰 전달
+            },
+            data: {itemId}, // DELETE 요청에서 body 전달
+          },
+        );
+        Alert.alert('찜 목록에서 제거되었습니다!');
+      } else {
+        // POST 요청
+        await axios.post(
+          `http://3.35.1.149:8080/mypage/like`, // endpoint
+          {itemId}, // Body에 itemId 전달
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Bearer 토큰 전달
+            },
+          },
+        );
+        Alert.alert('찜 목록에 추가되었습니다!');
+      }
+
+      setIsFavorited(!isFavorited); // 상태 업데이트
+    } catch (error) {
+      console.error('찜 상태 업데이트 실패:', error);
+      Alert.alert('찜 상태를 변경하는 데 실패했습니다.');
     }
   };
 
@@ -166,49 +235,65 @@ const ProductScreen = () => {
     return <Text>{error || '상품을 찾을 수 없습니다.'}</Text>;
   }
 
-  const imageUrl = product.productImageUrls && product.productImageUrls.length > 0
-    ? product.productImageUrls[currentImageIndex]
-    : 'https://via.placeholder.com/150';
+  const imageUrl =
+    product.productImageUrls && product.productImageUrls.length > 0
+      ? product.productImageUrls[currentImageIndex]
+      : 'https://via.placeholder.com/150';
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imageGallery}>
-        <TouchableOpacity onPress={handlePrevImage} style={[styles.arrowButton, styles.leftArrow]}>
+        <TouchableOpacity
+          onPress={handlePrevImage}
+          style={[styles.arrowButton, styles.leftArrow]}>
           <Text style={styles.arrowText}>‹</Text>
         </TouchableOpacity>
-        <Image source={{ uri: imageUrl }} style={styles.productImage} />
-        <TouchableOpacity onPress={handleNextImage} style={[styles.arrowButton, styles.rightArrow]}>
+        <Image source={{uri: imageUrl}} style={styles.productImage} />
+        <TouchableOpacity
+          onPress={handleNextImage}
+          style={[styles.arrowButton, styles.rightArrow]}>
           <Text style={styles.arrowText}>›</Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* 카테고리 및 상품 정보 바 */}
       <View style={styles.infoBar}>
         <Text style={styles.productCategory}>#{product.categoryId}</Text>
       </View>
-      
-      <View style={styles.detailsContainer}>
-        <Text style={styles.productPrice}>
-          {product.startingBid ? product.startingBid.toLocaleString() : '가격 정보 없음'} 원
-        </Text>
-          <View style={styles.productInfo}>
-            <Text style={styles.productLabel}>상품명</Text>
-            <Text style={styles.productTitle}>{product.title}</Text>
-          </View>
-          
-          <View style={styles.productInfo}>
-            <Text style={styles.productLabel}>상품 상태</Text>
-            <Text style={styles.productStatus}>{product.productStatus}</Text>
-          </View>
 
-          <View style={styles.productInfo}>
-            <Text style={styles.productLabel}>상품 설명 </Text>
-          </View>
-            <Text style={styles.productDescription}>{product.description}</Text>
+      <View style={styles.detailsContainer}>
+        <View style={styles.priceRow}>
+          <Text style={styles.productPrice}>
+            {product.startingBid
+              ? product.startingBid.toLocaleString()
+              : '가격 정보 없음'}{' '}
+            원
+          </Text>
+          <TouchableOpacity onPress={handleFavorite} style={styles.heartButton}>
+            <Ionicons
+              name={isFavorited ? 'heart' : 'heart-outline'} // 채워진 하트 또는 빈 하트
+              size={28}
+              color={isFavorited ? 'red' : '#909090'} // 상태에 따른 색상
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.productInfo}>
+          <Text style={styles.productLabel}>상품명</Text>
+          <Text style={styles.productTitle}>{product.title}</Text>
+        </View>
+
+        <View style={styles.productInfo}>
+          <Text style={styles.productLabel}>상품 상태</Text>
+          <Text style={styles.productStatus}>{product.productStatus}</Text>
+        </View>
+
+        <View style={styles.productInfo}>
+          <Text style={styles.productLabel}>상품 설명 </Text>
+        </View>
+        <Text style={styles.productDescription}>{product.description}</Text>
       </View>
 
       <View style={styles.separator} />
-
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>최근 제시가</Text>
           {bids.length > 0 ? (
@@ -240,21 +325,20 @@ const ProductScreen = () => {
       
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
-          <View style={styles.bidInputContainer}>
-            <TextInput
-              placeholder="입찰 금액"
-              value={bidAmount}
-              onChangeText={handleBidAmountChange}
-              style={styles.bidInput}
-              keyboardType="numeric" // 숫자 키보드만 표시
-            />
-            <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
-              <Text style={styles.buttonText}>등록</Text>
-            </TouchableOpacity>
-          </View>
-          {bidError ? <Text style={styles.error}>{bidError}</Text> : null}
+        <View style={styles.bidInputContainer}>
+          <TextInput
+            placeholder="입찰 금액"
+            value={bidAmount}
+            onChangeText={handleBidAmountChange}
+            style={styles.bidInput}
+            keyboardType="numeric" // 숫자 키보드만 표시
+          />
+          <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
+            <Text style={styles.buttonText}>등록</Text>
+          </TouchableOpacity>
         </View>
-
+        {bidError ? <Text style={styles.error}>{bidError}</Text> : null}
+      </View>
     </ScrollView>
   );
 };
@@ -290,6 +374,16 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 1, // 1:1 비율 설정
     resizeMode: 'cover',
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  heartButton: {
+    marginLeft: 10,
+    marginBottom: 18,
   },
   infoBar: {
     flexDirection: 'row',
@@ -383,8 +477,8 @@ const styles = StyleSheet.create({
   },
   bidInput: {
     flex: 1,
-    marginRight: 20,           // 입력 칸과 버튼 간의 간격
-    borderBottomWidth: 1,      // 아래쪽에만 테두리 두께 설정
+    marginRight: 20, // 입력 칸과 버튼 간의 간격
+    borderBottomWidth: 1, // 아래쪽에만 테두리 두께 설정
     borderBottomColor: '#C0C0C0', // 아래쪽 테두리 색상
     height: 44,
     fontFamily: 'Pretendard-Regular',
