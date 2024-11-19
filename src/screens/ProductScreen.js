@@ -17,7 +17,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AuthContext} from '../components/Auth/AuthContext';
 
 const ProductScreen = () => {
-  const {token} = useContext(AuthContext);
   const route = useRoute();
   const {itemId} = route.params;
   const [product, setProduct] = useState(null);
