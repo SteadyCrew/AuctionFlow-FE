@@ -1,10 +1,10 @@
-import React, {createContext, useState} from 'react';
+import React, { createContext, useState } from 'react';
 import axios from 'axios';
-import {BASE_URL} from '../../config/api';
+import { BASE_URL } from '../../config/api';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(null); // JWT 토큰을 저장할 상태
 
@@ -20,6 +20,9 @@ export const AuthProvider = ({children}) => {
         console.log('로그인 성공:', response.data);
         setIsLoggedIn(true);
         setToken(response.data.token);
+        
+        // 토큰을 콘솔에 출력
+        console.log('JWT 토큰:', response.data.token);
       } else {
         console.error('로그인 실패:', response.data);
       }
@@ -31,7 +34,7 @@ export const AuthProvider = ({children}) => {
   // 회원가입 함수
   const signUp = async (email, nickname, password) => {
     try {
-      const response = await axios.post('http://10.0.2.2:8080/user/register', {
+      const response = await axios.post(`${BASE_URL}/user/register`, {
         email,
         nickname,
         password,
@@ -39,8 +42,8 @@ export const AuthProvider = ({children}) => {
 
       if (response.status === 201) {
         console.log('회원가입 성공:', response.data);
-        // 회원가입 후 자동 로그인 또는 다른 처리
         setToken(response.data.token); // 서버가 토큰을 반환하는 경우 저장
+        console.log('JWT 토큰:', response.data.token); // 회원가입 시 반환된 토큰 출력
         return true;
       } else {
         console.error('회원가입 실패:', response.data);
@@ -58,7 +61,7 @@ export const AuthProvider = ({children}) => {
   };
 
   return (
-    <AuthContext.Provider value={{isLoggedIn, logIn, logOut, signUp, token}}>
+    <AuthContext.Provider value={{ isLoggedIn, logIn, logOut, signUp, token }}>
       {children}
     </AuthContext.Provider>
   );

@@ -50,13 +50,12 @@ const LogInScreen = ({navigation}) => {
 
       {/* 회원가입 및 로그인 안내 문구 */}
       <Text style={styles.subText}>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text
-            style={[styles.subText, {color: '#5DADE2', fontWeight: 'bold'}]}>
-            회원가입
+        <Text
+            style={styles.linkText}
+            onPress={() => navigation.navigate('SignUp')}>
+            회원가입{' '}
           </Text>
-        </TouchableOpacity>{' '}
-        및 로그인 후 이용이 가능합니다.
+         및 로그인 후 이용이 가능합니다.
       </Text>
     </View>
   );
@@ -67,39 +66,49 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
+    paddingHorizontal: 24,
   },
   logoText: {
+    fontFamily: 'Pretendard-ExtraBold',
     fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 40,
+    marginBottom: 20,
     color: '#5DADE2',
   },
   input: {
-    width: '80%',
-    padding: 15,
-    marginVertical: 10,
+    width: '90%',
+    padding: 12,
+    marginVertical: 8,
     borderWidth: 1,
-    borderColor: '#909090',
+    borderColor: '#C0C0C0',
     borderRadius: 8,
     backgroundColor: '#F5F5F5',
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 14,
   },
   loginButton: {
     backgroundColor: '#5DADE2',
-    padding: 15,
+    padding: 14,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80%',
-    marginTop: 20,
+    width: '90%',
+    marginTop: 30,
   },
   loginButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFF',
+    fontFamily: 'Pretendard-SemiBold',
   },
   subText: {
+    fontFamily: 'Pretendard-Regular',
     marginTop: 20,
     color: '#909090',
+    fontSize: 14,
+  },
+  linkText: {
+    fontFamily: 'Pretendard-Bold',
+    color: '#5DADE2',
     fontSize: 14,
   },
 });

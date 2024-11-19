@@ -36,13 +36,13 @@ function MainTabs() {
           display: route.name === '등록' ? 'none' : 'flex',
         },
         tabBarActiveTintColor: '#5DADE2',
-        tabBarInactiveTintColor: '#909090',
+        tabBarInactiveTintColor: '#000',
       })}>
       <Tab.Screen
         name="홈"
         component={HomeStack}
         options={{
-          tabBarIcon: ({color}) => <Icon name="home" size={22} color={color} />,
+          tabBarIcon: ({color}) => <Icon name="home" size={20} color={color} />,
           tabBarLabel: ({color}) => (
             <Text style={[styles.label, {color}]}>홈</Text>
           ),
@@ -53,7 +53,7 @@ function MainTabs() {
         component={FavStack}
         options={{
           tabBarIcon: ({color}) => (
-            <Icon name="heart" size={22} color={color} />
+            <Icon name="heart" size={20} color={color} />
           ),
           tabBarLabel: ({color}) => (
             <Text style={[styles.label, {color}]}>찜</Text>
@@ -77,7 +77,7 @@ function MainTabs() {
         component={MyDealsStack}
         options={{
           tabBarIcon: ({color}) => (
-            <Icon2 name="shopping-bag" size={22} color={color} />
+            <Icon2 name="shopping-bag" size={20} color={color} />
           ),
           tabBarLabel: ({color}) => (
             <Text style={[styles.label, {color}]}>내 거래</Text>
@@ -85,11 +85,11 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="상품"
-        component={ProductScreen}
+        name="마이 페이지"
+        component={MypageStack}
         options={{
           tabBarIcon: ({color}) => (
-            <Icon2 name="user" size={22} color={color} />
+            <Icon2 name="user" size={20} color={color} />
           ),
           tabBarLabel: ({color}) => (
             <Text style={[styles.label, {color}]}>마이페이지</Text>
@@ -228,6 +228,7 @@ function AppNavigator() {
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
               }}
             />
+            
           </>
         )}
       </Stack.Navigator>
@@ -245,7 +246,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     fontFamily: 'Pretendard-Regular',
-    paddingTop: -6,
     paddingBottom: 10,
   },
 });

@@ -31,21 +31,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#F0F0F0',
-    borderRadius: 15,
+    borderRadius: 18,
     height: 30,
   },
   tab: {
     flex: 1,
     alignItems: 'center', // 가로 방향 중앙 정렬
     justifyContent: 'center', // 세로 방향 중앙 정렬
-    borderRadius: 15,
-    height: 30,
+    borderRadius: 18,
   },
   activeTab: {
     backgroundColor: '#5DADE2', // 선택된 탭의 배경색
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Pretendard-Regular',
     color: '#000',
   },

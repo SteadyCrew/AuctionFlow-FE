@@ -36,7 +36,7 @@ const Goods = ({items}) => {
       <View style={styles.itemContainer}>
         <TouchableOpacity
           style={{alignItems: 'center'}}
-          onPress={() => navigation.navigate('상품', {itemId: item.id})}>
+          onPress={() => navigation.navigate('Product', {itemId: item.id})}>
           <Image source={{uri: item.image}} style={styles.itemImage} />
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemPrice}>{item.price}</Text>
@@ -60,42 +60,37 @@ const Goods = ({items}) => {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingHorizontal: 10,
     paddingBottom: 100,
-  },
-  itemInvisible: {
-    backgroundColor: 'transparent',
-    elevation: 0,
-    shadowOpacity: 0,
-    flex: 1,
-    height: 0,
+    paddingHorizontal: 24,
   },
   itemContainer: {
-    backgroundColor: '#fff',
     flex: 1,
-    margin: 5,
+    marginVertical: 8,
     alignItems: 'center',
-    borderRadius: 5,
-    paddingTop: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
   },
   itemImage: {
-    width: windowWidth / (numColumns + 2), // 이미지 너비
-    height: 95, // 이미지 높이
-    resizeMode: 'cover', // 이미지 비율 유지
+    width: windowWidth / (numColumns + 0.6), // 1:1 비율을 위해 너비에 맞춘 높이 설정
+    height: windowWidth / (numColumns + 0.6), // 너비와 동일한 높이로 설정
+    resizeMode: 'cover',
+    borderRadius: 8, // 둥근 모서리 적용
   },
   itemTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    marginTop: 6,
+    fontFamily: 'Pretendard-Regular',
+    color: '#000',
+    alignSelf: 'flex-start', // 왼쪽 정렬
+    marginLeft: 6, // 왼쪽 여백 추가
   },
   itemPrice: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#000',
+    fontFamily: 'Pretendard-Bold',
+    alignSelf: 'flex-start', // 왼쪽 정렬
+    marginLeft: 6, // 왼쪽 여백 추가
   },
 });
+
+
 
 export default Goods;
