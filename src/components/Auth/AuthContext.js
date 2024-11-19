@@ -6,7 +6,8 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState(null); // JWT 토큰을 저장할 상태
+  const [token, setToken] = useState(null);
+  const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
 
   // 로그인 함수
   const logIn = async (email, password) => {
@@ -17,12 +18,12 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.status === 200) {
-        console.log('로그인 성공:', response.data);
         setIsLoggedIn(true);
         setToken(response.data.token);
-        
-        // 토큰을 콘솔에 출력
+        setNickname(response.data.nickname); // 닉네임 저장
+        console.log('로그인 성공:', response.data);
         console.log('JWT 토큰:', response.data.token);
+        console.log('닉네임:', response.data.nickname); // 닉네임 출력
       } else {
         console.error('로그인 실패:', response.data);
       }
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
       console.error('로그인 중 오류 발생:', error);
     }
   };
+
 
   // 회원가입 함수
   const signUp = async (email, nickname, password) => {
@@ -53,15 +55,16 @@ export const AuthProvider = ({ children }) => {
     }
     return false;
   };
-
+  
   // 로그아웃 함수
   const logOut = () => {
     setIsLoggedIn(false);
-    setToken(null); // 로그아웃 시 토큰 초기화
+    setToken(null);
+    setNickname(''); // 로그아웃 시 닉네임 초기화
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, logIn, logOut, signUp, token }}>
+    <AuthContext.Provider value={{ isLoggedIn, logIn, logOut, signUp, token, nickname }}>
       {children}
     </AuthContext.Provider>
   );

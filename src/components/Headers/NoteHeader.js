@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   headerTitle: {
+    marginBottom:5,
     fontSize: 18,
     fontFamily: 'Pretendard-SemiBold',
     color: '#000',

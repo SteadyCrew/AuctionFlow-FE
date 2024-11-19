@@ -4,23 +4,27 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import ProductScreen from '../screens/ProductScreen';
+import ProductHeader from '../components/Headers/ProductHeader';
 import MyDealsScreen from '../screens/MyDealScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import FavScreen from '../screens/FavScreen';
 import MypageScreen from '../screens/MypageScreen';
 import SearchScreen from '../screens/SearchScreen';
+import SearchResultScreen from '../screens/SearchResultScreen';
 import NoteScreen from '../screens/NoteScreen';
 import Header from '../components/Headers/Header';
-import SearchHeader from '../components/Headers/SearchHeader';
 import NoteHeader from '../components/Headers/NoteHeader';
 import Icon from 'react-native-vector-icons/Octicons';
 import Icon2 from 'react-native-vector-icons/Feather';
 import {StyleSheet, Text} from 'react-native';
-import RegisterHeader from '../components/Headers/RegisterHeader';
 import {AuthContext} from '../components/Auth/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 import LogInScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import AddressScreen from '../screens/AddressScreen';
+import AddressHeader from '../components/Headers/AddressHeader';
+import AddressSearchScreen from '../screens/AddressSearchScreen';
+import SearchHeader from '../components/Headers/SearchHeader';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -107,11 +111,6 @@ const HomeStack = () => (
       component={HomeScreen}
       options={{header: () => <Header />}}
     />
-    <Stack.Screen
-      name="Product"
-      component={ProductScreen}
-      options={{header: () => <Header />}}
-    />
   </Stack.Navigator>
 );
 
@@ -130,7 +129,7 @@ const RegisterStack = () => (
     <Stack.Screen
       name="Register"
       component={RegisterScreen}
-      options={{headerShown: false}} // 헤더 숨기기
+      options={{headerShown: false}}
     />
   </Stack.Navigator>
 );
@@ -171,12 +170,12 @@ const AuthNavigator = () => (
 );
 
 function AppNavigator() {
-  const {isLoggedIn} = useContext(AuthContext); // 로그인 상태 가져오기
+  const {isLoggedIn} = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
-      setIsLoading(false); // 2초 후 로딩 상태 false로 변경
+      setIsLoading(false);
     }, 2000);
   }, []);
 
@@ -184,14 +183,12 @@ function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
         {isLoading ? (
-          // 로딩 중일 때 스플래시 화면
           <Stack.Screen
             name="Splash"
             component={SplashScreen}
             options={{headerShown: false}}
           />
         ) : !isLoggedIn ? (
-          // 로그인하지 않았을 때 AuthNavigator 사용
           <Stack.Screen
             name="Auth"
             component={AuthNavigator}
@@ -202,7 +199,7 @@ function AppNavigator() {
             <Stack.Screen
               name="Main"
               component={MainTabs}
-              options={{headerShown: false}} // 탭 내비게이션 숨기기
+              options={{headerShown: false}}
             />
             <Stack.Screen
               name="Note"
@@ -213,22 +210,46 @@ function AppNavigator() {
               }}
             />
             <Stack.Screen
+              name="AddressScreen"
+              component={AddressScreen}
+              options={{
+                header: () => <AddressHeader />,  // AddressScreen에만 별도의 헤더 사용
+                tabBarStyle: { display: 'none' },  // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
+              name="AddressSearch"
+              component={AddressSearchScreen}
+              options={{
+                header: () => <AddressHeader />,
+                tabBarStyle: { display: 'none' }, // 탭 메뉴 숨기기
+              }}
+            />
+            <Stack.Screen
               name="Search"
               component={SearchScreen}
               options={{
-                header: () => <SearchHeader />, // SearchHeader 추가
+                headerShown: false, // SearchHeader 추가
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
               }}
             />
             <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
+              name="SearchResult"
+              component={SearchResultScreen}
               options={{
-                header: () => <RegisterHeader />, // RegisterHeader 추가
+                header: () => <SearchHeader />,
                 tabBarStyle: {display: 'none'}, // 탭 메뉴 숨기기
               }}
             />
-            
+            {/* ProductScreen 별도 관리 */}
+            <Stack.Screen
+              name="Product"
+              component={ProductScreen}
+              options={{
+                header: () => <ProductHeader />,
+                tabBarStyle: {display: 'none'}, // 탭 바 숨기기
+              }}
+            />
           </>
         )}
       </Stack.Navigator>

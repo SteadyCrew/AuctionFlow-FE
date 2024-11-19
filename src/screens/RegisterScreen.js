@@ -109,79 +109,66 @@ const RegisterScreen = () => {
   };
 
   const handleSubmit = async () => {
-    // 유효성 검사
     if (!validateForm()) {
-      return; // 폼이 유효하지 않으면 제출하지 않음
+      return;
     }
   
-    setLoading(true); // 로딩 상태 설정
+    setLoading(true);
   
     const formData = new FormData();
   
     const itemData = {
-      categoryId: getCategoryID(selectedCategory), // 올바른 ID가 반환되고 있는지 확인
-      title: productName, // 제목이 비어있지 않은지 확인
-      productStatus: status, // 상태가 올바른 값인지 확인
-      description: description, // 설명이 비어있지 않은지 확인
-      startingBid: parseFloat(price), // 숫자 형식인지 확인
-      auctionEndTime: formatDateTime(selectedDate, endHour, endMinute), // 날짜 형식이 올바른지 확인
-      itemBidStatus: 'active', // 상태가 올바른지 확인
+      categoryId: getCategoryID(selectedCategory),
+      title: productName,
+      productStatus: status,
+      description: description,
+      startingBid: parseFloat(price),
+      auctionEndTime: formatDateTime(selectedDate, endHour, endMinute),
+      itemBidStatus: 'active',
     };
-    
-    // FormData에 item 데이터 추가
-    formData.append('item', JSON.stringify(itemData));
-
-    // 콘솔에 itemData 출력
-    console.log('Item Data:', itemData);
-
   
-    // 이미지 파일 추가
+    formData.append('item', JSON.stringify(itemData));
+  
     productImages.forEach((image, index) => {
       formData.append('images', {
         uri: image.uri,
-        type: image.type || 'image/jpeg', // 이미지 타입 지정
-        name: image.fileName || `image_${index}.jpg`, // 파일 이름 지정
+        type: image.type || 'image/jpeg',
+        name: image.fileName || `image_${index}.jpg`,
       });
     });
-    
-    
   
     try {
       const response = await fetch('http://3.35.1.149:8080/items', {
         method: 'POST',
         body: formData,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` }, // 헤더에 토큰 추가
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
+      const contentType = response.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
   
-      // 서버 응답 전체를 로그로 출력
-      console.log('Response:', response); 
-      console.log('Response status:', response.status); // 상태 코드 로그 출력
-  
-      if (response.ok) {
-        // 응답이 성공적일 경우
-        resetForm(); // 폼 리셋
-        Alert.alert('Success', 'Item has been registered successfully.'); // 성공 메시지
-        navigation.navigate('Home');
+        if (response.ok) {
+          resetForm();
+          Alert.alert('Success', 'Item has been registered successfully.');
+          navigation.navigate('Home');
+        } else {
+          Alert.alert('Error', data.message || 'Failed to register item.');
+        }
       } else {
-        // 응답이 성공적이지 않을 경우
-        const errorData = await response.json(); // 에러 데이터 파싱
-        Alert.alert('Error', errorData.message || 'Failed to register item.'); // 에러 메시지 표시
+        throw new Error('Invalid response format');
       }
     } catch (error) {
-      // 네트워크 오류 발생 시
-      console.error('Fetch error:', error); // 오류 로그 출력
-      Alert.alert('Network Error', 'Failed to connect to server.'); // 네트워크 오류 메시지
+      console.error('Fetch error:', error);
+      Alert.alert('Network Error', 'Failed to connect to server.');
     } finally {
-      // 로딩 상태 해제
       setLoading(false);
     }
   };
   
   
-  
-
   const resetForm = () => {
     setProductName('');
     setSelectedCategory("default");

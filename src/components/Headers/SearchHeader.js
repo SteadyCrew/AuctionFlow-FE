@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Feather';
 
-function SearchHeader() {
+const SearchHeader = () => {
   const navigation = useNavigation();
   const [searchTerm, setSearchTerm] = useState('');
 
+  const handleSearch = () => {
+    if (searchTerm) {
+      navigation.navigate('SearchResult', { searchTerm }); // 검색어를 결과 화면으로 전달
+    }
+  };
+
   const handleCancel = () => {
-    setSearchTerm(''); // 검색어 초기화
-    navigation.goBack(); // 뒤로가기
+    setSearchTerm('');
+    navigation.goBack();
   };
 
   return (
@@ -19,6 +24,7 @@ function SearchHeader() {
         placeholder="검색어를 입력하세요"
         value={searchTerm}
         onChangeText={setSearchTerm}
+        onSubmitEditing={handleSearch} // Enter 키로 검색
         placeholderTextColor="#888"
       />
       <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
@@ -26,7 +32,7 @@ function SearchHeader() {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -39,19 +45,19 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: '#F6F6F6', // 배경색
-    borderWidth: 0, // 테두리 제거
-    borderRadius: 20, // 모서리 둥글게 (40 -> 20으로 조정)
-    paddingVertical: 0, // 수직 여백 줄이기
+    backgroundColor: '#F6F6F6',
+    borderWidth: 0,
+    borderRadius: 20,
+    paddingVertical: 0,
     paddingHorizontal: 12,
-    height: 36, // 고정된 높이
+    height: 36,
     fontFamily: 'Pretendard-Regular',
   },
   cancelButton: {
-    marginLeft: 10, // 아이콘과 버튼 간격 조정
+    marginLeft: 10,
   },
   cancelButtonText: {
-    color: '#909090', // 취소 버튼 색상
+    color: '#909090',
     fontSize: 14,
     fontFamily: 'Pretendard-Regular',
   },
