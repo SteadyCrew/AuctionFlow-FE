@@ -8,7 +8,15 @@ const MypageScreen = () => {
   const [address, setAddress] = useState(null); // 주소 상태 관리
   const navigation = useNavigation(); // useNavigation 훅 사용
 
-  // 배송지 정보를 서버에서 가져오는 함수
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchAddress(); // Re-fetch the address when MypageScreen comes into focus
+    });
+  
+    return unsubscribe;
+  }, [navigation]);
+  
+  // Fetch address from the server as usual
   const fetchAddress = async () => {
     try {
       const response = await fetch('http://3.35.1.149:8080/mypage/store/storeInfo', {
@@ -17,19 +25,23 @@ const MypageScreen = () => {
           'Authorization': `Bearer ${token}`, // JWT 토큰 추가
         },
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        setAddress(data); // 서버에서 받은 주소 정보 상태에 저장
+        if (data && Object.keys(data).length > 0) {
+          setAddress(data); // 서버에서 받은 주소 정보 상태에 저장
+        } else {
+          setAddress(null); // 주소 정보가 없으면 null로 설정
+        }
       } else {
-        Alert.alert('배송지 정보를 불러오는 데 실패했습니다.');
+        console.error('배송지 정보를 불러오는 데 실패했습니다.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('주소 정보를 불러오는 데 오류가 발생했습니다.');
     }
   };
+   
 
   // 컴포넌트가 마운트될 때 주소 정보 가져오기
   useEffect(() => {
@@ -67,21 +79,21 @@ const MypageScreen = () => {
 
       {/* 배송지 */}
       <View style={styles.addressContainer}>
-      <View style={styles.addressbutton}>
-        <Text style={styles.sectionTitle}>배송지</Text>
-        <TouchableOpacity onPress={goToAddressEdit}>
-          <Text style={styles.editButton}>수정</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.addressbutton}>
+          <Text style={styles.sectionTitle}>배송지</Text>
+          <TouchableOpacity onPress={goToAddressEdit}>
+            <Text style={styles.editButton}>수정</Text>
+          </TouchableOpacity>
+        </View>
         {address ? (
           <Text style={styles.address}>
-          {`${address.basicAddr} ${address.detailAddr}  (${String(address.postcode).padStart(5, '0')})`}
-        </Text>
-        
+            {`${address.basicAddr}\n${address.detailAddr} (${String(address.postcode).padStart(5, '0')})`}
+          </Text>
         ) : (
-          <Text style={styles.addressText}>주소를 불러오는 중입니다...</Text>
+          <Text style={styles.addressText}>배송지를 설정해주세요.</Text>
         )}
       </View>
+
     </View>
   );
 };

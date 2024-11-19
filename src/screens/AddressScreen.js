@@ -26,36 +26,72 @@ function AddressScreen({ route }) {
 
   const handleSave = async () => {
     try {
-      // POST 요청을 보낼 주소 데이터 형식
       const { zipcode, areaAddress, townAddress } = addressObj;
-      
-      const response = await fetch('http://3.35.1.149:8080/mypage/store', {
-        method: 'PATCH',
+  
+      // 주소가 이미 설정되어 있는지 확인하기 위해 먼저 조회 요청
+      const checkResponse = await fetch('http://3.35.1.149:8080/mypage/store/storeInfo', {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          postcode: zipcode,
-          basicAddr: areaAddress,
-          detailAddr: townAddress,
-        }),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('주소가 저장되었습니다.');
-        navigation.goBack(); // MypageScreen으로 돌아가기
+  
+      if (checkResponse.ok) {
+        // 이미 주소가 설정된 경우, PATCH 요청
+        const response = await fetch('http://3.35.1.149:8080/mypage/store', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            postcode: zipcode,
+            basicAddr: areaAddress,
+            detailAddr: townAddress,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          alert('주소가 수정되었습니다.');
+          navigation.goBack();
+        } else {
+          alert('주소 수정에 실패했습니다.');
+        }
       } else {
-        alert('주소 저장에 실패했습니다.');
+        // 주소가 없는 경우, POST 요청
+        const response = await fetch('http://3.35.1.149:8080/mypage/store', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            postcode: zipcode,
+            basicAddr: areaAddress,
+            detailAddr: townAddress,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          alert('주소가 저장되었습니다.');
+          navigation.goBack();
+        } else {
+          alert('주소 저장에 실패했습니다.');
+        }
       }
     } catch (error) {
       console.error(error);
       alert('주소 저장 중 오류가 발생했습니다.');
     }
   };
-
+  
+  
+  
+  
   return (
     <View style={styles.container}>
 

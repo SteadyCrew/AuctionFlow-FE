@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemImage: {
-    width: windowWidth / (numColumns + 0.65), // 1:1 비율을 위해 너비에 맞춘 높이 설정
+    width: windowWidth / (numColumns + 0.6), // 1:1 비율을 위해 너비에 맞춘 높이 설정
     height: windowWidth / (numColumns + 0.6), // 너비와 동일한 높이로 설정
     resizeMode: 'cover',
     borderRadius: 8, // 둥근 모서리 적용
