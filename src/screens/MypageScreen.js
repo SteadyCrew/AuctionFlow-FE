@@ -82,10 +82,6 @@ const MypageScreen = () => {
           <Text style={styles.addressText}>주소를 불러오는 중입니다...</Text>
         )}
       </View>
-
-
-
-
     </View>
   );
 };

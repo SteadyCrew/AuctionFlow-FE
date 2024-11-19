@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
 const numColumns = 3; // 열 개수
@@ -88,7 +81,13 @@ const SearchResultScreen = ({ route }) => {
         />
       </>
       ) : (
-        <Text style={styles.noResultsText}>검색 결과가 없습니다.</Text>
+        <View style={styles.noResultsContainer}>
+          <Icon name="error-outline" size={50} color="#000"/>
+          <Text style={styles.noResultsText}>
+            "{searchTerm}" 에 대한 검색 결과가 없습니다.{'\n'}다른 검색어로 시도해보세요.
+          </Text>
+        </View>
+
       )}
     </View>
   );
@@ -112,12 +111,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  noResultsContainer: {
+    flex: 1,
+    alignItems: 'center', // 수평 중앙 정렬
+    marginTop:20,
+  },
   noResultsText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#000',
-    fontFamily: 'Pretendard-Bold',
+    fontFamily: 'Pretendard-Regular',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   listContainer: {
     paddingTop: 18,
