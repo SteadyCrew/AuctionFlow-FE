@@ -1,16 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  Button,
-  ScrollView,
-  ActivityIndicator,
-  TextInput,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, Image, ScrollView, ActivityIndicator, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -23,6 +12,8 @@ const ProductScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bids, setBids] = useState([]);
+  const [highestBid, setHighestBid] = useState('');
+  const [startPrice, setStartPrice]= useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -62,6 +53,14 @@ const ProductScreen = () => {
         // 입찰 내역을 최신 순으로 정렬 (내림차순)
         const sortedBids = response.data.sort((a, b) => b.bidId - a.bidId);
         setBids(sortedBids);
+
+              // 시작 가격과 현재 최고 입찰 금액을 비교
+      const highestBid = sortedBids[0]?.bidAmount || 0;
+      const itemStartPrice = response.data.itemStartPrice; // 상품의 시작 가격을 받아오는 부분 추가
+
+      setHighestBid(highestBid); // 최고 입찰 금액 상태 업데이트
+      setStartPrice(itemStartPrice); // 시작 가격 상태 업데이트
+
       } catch (error) {
         console.error("입찰 내역 불러오기 실패:", error);
         if (error.response) {
@@ -77,9 +76,6 @@ const ProductScreen = () => {
     fetchBids(); // fetchBids 함수 호출
   }, [itemId, token]); // itemId나 token이 변경될 때마다 호출
   
-  
-  
-
   const handleBidSubmit = async () => {
     // 입찰 금액 유효성 검사
     if (bidError || !bidAmount) {
@@ -90,6 +86,17 @@ const ProductScreen = () => {
     // 토큰이 없는 경우 체크
     if (!token) {
       Alert.alert("로그인이 필요합니다.");
+      return;
+    }
+  
+    // 입찰 금액이 시작 가격보다 낮거나 현재 최고 입찰 금액보다 낮으면 경고
+    if (parseInt(bidAmount, 10) < startPrice) {
+      Alert.alert(`입찰 금액은 시작 가격(${startPrice}원) 이상이어야 합니다.`);
+      return;
+    }
+  
+    if (parseInt(bidAmount, 10) <= highestBid) {
+      Alert.alert(`현재 최고 입찰 금액(${highestBid}원)보다 높은 금액을 제시해야 합니다.`);
       return;
     }
   
@@ -113,38 +120,37 @@ const ProductScreen = () => {
       setBidError(''); // 오류 메시지 초기화
   
       // 입찰 성공 시, 새로운 입찰을 bids 배열 맨 앞에 추가
-      setBids(prevBids => [
-        { bidAmount: parseInt(bidAmount, 10), bidId: response.data.bidId }, // 새로운 입찰을 앞에 추가
-        ...prevBids
-      ]);
+      setBids(prevBids => {
+        const updatedBids = [
+          { bidAmount: parseInt(bidAmount, 10), bidId: response.data.bidId },
+          ...prevBids
+        ];
+        
+        // 최고 입찰 금액 갱신
+        const newHighestBid = updatedBids[0]?.bidAmount || 0;
+        setHighestBid(newHighestBid); // 최고 입찰 금액 상태 업데이트
+  
+        return updatedBids;
+      });
   
     } catch (error) {
       console.error("입찰 실패 에러: ", error);
   
       if (error.response) {
-        // 서버에서 응답을 받았을 때
-        console.error("응답 오류:", error.response);
-  
-        // 403 오류에 대한 세부 메시지 처리
         if (error.response.status === 403) {
           Alert.alert("권한이 없습니다. 다시 시도해 주세요.");
         } else {
           Alert.alert(error.response?.data?.message || "입찰에 실패했습니다.");
         }
       } else if (error.request) {
-        // 요청이 보내졌지만 응답이 없을 때
-        console.error("요청 오류:", error.request);
         Alert.alert("서버 응답이 없습니다. 다시 시도해주세요.");
       } else {
-        // 다른 오류 발생 시
-        console.error("에러 메시지:", error.message);
         Alert.alert("입찰에 실패했습니다.");
       }
     }
   };
   
-  
-  
+
   
   // 입찰 금액 유효성 검사 함수
   const validateBidAmount = (value) => {
