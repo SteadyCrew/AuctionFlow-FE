@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import Goods from '../components/Goods';
 import {AuthContext} from '../components/Auth/AuthContext';
 import {fetchDataAfterLogin} from '../components/API/fetchDataAfterLogin';
 import {deleteData} from '../components/API/deleteData';
+import {useFocusEffect} from '@react-navigation/native';
 
 const FavScreen = () => {
   const {token} = useContext(AuthContext);
@@ -19,21 +20,32 @@ const FavScreen = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
-  useEffect(() => {
-    const loadItems = async () => {
-      if (!token) {
-        console.error('Token이 없습니다.'); // token이 없으면 요청하지 않음
-        return;
-      }
+  useFocusEffect(
+    useCallback(() => {
+      const loadItems = async () => {
+        if (!token) {
+          console.error('Token이 없습니다.'); // token이 없으면 요청하지 않음
+          return;
+        }
 
-      setLoading(true);
-      const formattedItems = await fetchDataAfterLogin('mypage/like', token); // token 전달
-      setItems(formattedItems);
-      setLoading(false);
-    };
+        setLoading(true);
+        try {
+          const formattedItems = await fetchDataAfterLogin(
+            'mypage/like',
+            token,
+          ); // token 전달
+          setItems(formattedItems);
+        } catch (error) {
+          console.error('데이터 로드 실패:', error);
+          Alert.alert('오류', '찜 데이터를 불러오는 데 실패했습니다.');
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    loadItems();
-  }, [token]);
+      loadItems();
+    }, [token]), // token이 변경될 때만 새로고침
+  );
 
   const handleDelete = async itemId => {
     try {
