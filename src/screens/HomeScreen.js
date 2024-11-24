@@ -4,43 +4,48 @@ import axios from 'axios';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
 import {BASE_URL} from '../config/api';
+import {useNavigation} from '@react-navigation/native';
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
+  // 데이터를 가져오는 함수
+  const fetchData = async () => {
+    try {
+      setLoading(true); // 로딩 상태 활성화
+      const response = await axios.get(`${BASE_URL}/items`);
+      const data = response.data;
+
+      // 가져온 데이터를 원하는 구조로 변환
+      const formattedItems = data.map(item => ({
+        id: item.itemId,
+        image:
+          item.productImageUrls[0] ||
+          'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png',
+        title: item.title,
+        price: `${item.startingBid.toLocaleString()}원`,
+      }));
+
+      setItems(formattedItems);
+    } catch (error) {
+      console.error('데이터 가져오기 실패:', error);
+    } finally {
+      setLoading(false); // 로딩 상태 비활성화
+    }
+  };
+
+  // 화면에 돌아올 때 데이터를 새로고침
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/items`); // localhost 대신 IP 주소 사용
-        const data = response.data;
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData(); // 데이터 새로고침
+    });
 
-        // 가져온 데이터를 원하는 구조로 변환
-        const formattedItems = data.map(item => ({
-          id: item.itemId,
-          image:
-            item.productImageUrls[0] ||
-            'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 이미지가 없을 경우 기본 이미지 사용
-          // 현재 인터넷 이미지 주소를 사용 AWS에 새로운 default 이미지 생성 필요
-          title: item.title,
-          price: `${item.startingBid.toLocaleString()}원`, // 가격에 통화 기호 추가
-        }));
-
-        setItems(formattedItems);
-      } catch (error) {
-        console.error('데이터 가져오기 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    return unsubscribe; // 컴포넌트가 unmount되면 listener 해제
+  }, [navigation]);
 
   const handleTabPress = tab => {
-    console.log(`handleTabPress 함수 호출됨. 선택된 탭: ${tab}`);
     setSelectedTab(tab);
   };
 
@@ -49,7 +54,6 @@ const HomeScreen = () => {
       return <ActivityIndicator size="large" color="#0000ff" />;
     }
 
-    console.log(`선택된 탭: ${selectedTab}`);
     switch (selectedTab) {
       case '랭킹':
         return (
