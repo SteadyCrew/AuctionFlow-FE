@@ -71,10 +71,18 @@ const FavScreen = () => {
           <View style={styles.headerContainer}>
             <Text style={styles.text}>찜</Text>
             <TouchableOpacity
-              style={styles.editButton}
+              style={[
+                styles.editButton,
+                isEditing ? styles.editButtonEditing : styles.editButtonDefault,
+              ]}
               onPress={() => setIsEditing(prev => !prev)} // 편집 모드 토글
             >
-              <Text style={styles.editButtonText}>
+              <Text
+                style={
+                  isEditing
+                    ? styles.editButtonTextEditing
+                    : styles.editButtonTextDefault
+                }>
                 {isEditing ? '완료' : '편집'}
               </Text>
             </TouchableOpacity>
@@ -94,11 +102,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 10,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 10,
+  },
   text: {
     fontSize: 18,
     color: '#000',
-    paddingHorizontal: 24,
     fontFamily: 'Pretendard-Bold',
+  },
+  editButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  editButtonEditing: {
+    backgroundColor: '#4C8FD4', // "완료" 버튼 배경색
+  },
+  editButtonDefault: {
+    backgroundColor: 'transparent', // "편집"은 배경 투명
+  },
+  editButtonTextEditing: {
+    color: '#fff', // "완료" 텍스트 색상
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  editButtonTextDefault: {
+    textDecorationLine: 'underline', // "편집" 텍스트 밑줄
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000', // 검정 텍스트
   },
 });
 

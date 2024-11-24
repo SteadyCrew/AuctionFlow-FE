@@ -16,17 +16,17 @@ const windowWidth = Dimensions.get('window').width;
 const Goods = ({items, onDelete}) => {
   const navigation = useNavigation();
 
-  const formatData = (items, numColumns) => {
-    const totalRows = Math.floor(items.length / numColumns); // 전체 행 수 계산
-    let totalLastRow = items.length - totalRows * numColumns; // 마지막 행의 아이템 수
+  const formatData = (data, numColumn) => {
+    const totalRows = Math.floor(items.length / numColumn); // 전체 행 수 계산
+    let totalLastRow = data.length - totalRows * numColumn; // 마지막 행의 아이템 수
 
     // 마지막 행에 빈 공간이 있으면 빈 객체를 추가하여 균등하게 만듦
-    while (totalLastRow !== 0 && totalLastRow !== numColumns) {
-      items.push({id: `blank-${totalLastRow}`, empty: true});
+    while (totalLastRow !== 0 && totalLastRow !== numColumn) {
+      data.push({id: `blank-${totalLastRow}`, empty: true});
       totalLastRow++;
     }
 
-    return items;
+    return data;
   };
 
   const renderItem = ({item}) => {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     position: 'absolute',
     top: -8,
-    right: -4,
+    right: 0,
     width: 24,
     height: 24,
     borderRadius: 14,
