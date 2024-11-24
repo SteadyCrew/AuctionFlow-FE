@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import Goods from '../components/Goods';
 import {AuthContext} from '../components/Auth/AuthContext';
-import {fetchDataAfterLogin} from '../components/fetchDataAfterLogin';
+import {fetchDataAfterLogin} from '../components/API/fetchDataAfterLogin';
 
 const FavScreen = () => {
   const {token} = useContext(AuthContext);
