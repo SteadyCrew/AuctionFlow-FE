@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import axios from 'axios';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
-import {BASE_URL} from '../config/api';
+import {getData} from '../components/API/getData';
 
 const HomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
@@ -12,23 +11,28 @@ const HomeScreen = () => {
 
   // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
   useEffect(() => {
-    const fetchData = async () => {
+    const loadItems = async () => {
+      setLoading(true);
+
       try {
-        const response = await axios.get(`${BASE_URL}/items`); // localhost 대신 IP 주소 사용
-        const data = response.data;
+        let endpoint = '';
+        switch (selectedTab) {
+          case '랭킹':
+            endpoint = 'items/selling'; // 랭킹 데이터 API
+            break;
+          case '전체목록':
+            endpoint = 'items'; // 전체 목록 API
+            break;
+          case '판매목록':
+            endpoint = 'items/end'; // 판매 목록 API
+            break;
+          default:
+            console.error('알 수 없는 탭입니다:', selectedTab);
+            return;
+        }
 
-        // 가져온 데이터를 원하는 구조로 변환
-        const formattedItems = data.map(item => ({
-          id: item.itemId,
-          image:
-            item.productImageUrls[0] ||
-            'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 이미지가 없을 경우 기본 이미지 사용
-          // 현재 인터넷 이미지 주소를 사용 AWS에 새로운 default 이미지 생성 필요
-          title: item.title,
-          price: `${item.startingBid.toLocaleString()}원`, // 가격에 통화 기호 추가
-        }));
-
-        setItems(formattedItems);
+        const data = await getData(endpoint); // API 요청
+        setItems(data);
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);
       } finally {
@@ -36,8 +40,8 @@ const HomeScreen = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    loadItems();
+  }, [selectedTab]); // selectedTab이 변경될 때마다 호출
 
   const handleTabPress = tab => {
     console.log(`handleTabPress 함수 호출됨. 선택된 탭: ${tab}`);
