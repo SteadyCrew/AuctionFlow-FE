@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
-import {fetchData} from '../components/API/api';
+import {getData} from '../components/API/getData';
 
 const HomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
@@ -31,7 +31,7 @@ const HomeScreen = () => {
             return;
         }
 
-        const data = await fetchData(endpoint); // API 요청
+        const data = await getData(endpoint); // API 요청
         setItems(data);
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);

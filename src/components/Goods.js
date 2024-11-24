@@ -13,8 +13,9 @@ import {useNavigation} from '@react-navigation/native';
 const numColumns = 3;
 const windowWidth = Dimensions.get('window').width;
 
-const Goods = ({items}) => {
+const Goods = ({items, onDelete}) => {
   const navigation = useNavigation();
+
   const formatData = (items, numColumns) => {
     const totalRows = Math.floor(items.length / numColumns); // 전체 행 수 계산
     let totalLastRow = items.length - totalRows * numColumns; // 마지막 행의 아이템 수
@@ -27,13 +28,16 @@ const Goods = ({items}) => {
 
     return items;
   };
+
   const renderItem = ({item}) => {
     if (item.empty) {
-      // 빈 아이템에 대한 렌더링, 완전히 투명하고 크기가 없도록 설정
+      // 빈 아이템에 대한 렌더링
       return <View style={[styles.itemContainer, styles.itemInvisible]} />;
     }
+
     return (
       <View style={styles.itemContainer}>
+        {/* 상품 이미지 및 정보 */}
         <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => navigation.navigate('Product', {itemId: item.id})}>
@@ -41,6 +45,20 @@ const Goods = ({items}) => {
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemPrice}>{item.price}</Text>
         </TouchableOpacity>
+
+        {/* 삭제 버튼 (onDelete가 제공되었을 때만 표시) */}
+        {onDelete && (
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => {
+              onDelete(item.id);
+              console.log('삭제할 아이템 ID:', item.id);
+            }}>
+            <View style={styles.deleteButtonIcon}>
+              <Text style={styles.deleteButtonText}>–</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -67,30 +85,54 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 14,
     alignItems: 'center',
+    position: 'relative', // 삭제 버튼을 절대 위치로 배치하기 위해 필요
   },
   itemImage: {
-    width: windowWidth / (numColumns + 0.65), // 1:1 비율을 위해 너비에 맞춘 높이 설정
-    height: windowWidth / (numColumns + 0.6), // 너비와 동일한 높이로 설정
+    width: windowWidth / (numColumns + 0.65),
+    height: windowWidth / (numColumns + 0.6),
     resizeMode: 'cover',
-    borderRadius: 8, // 둥근 모서리 적용
+    borderRadius: 8,
   },
   itemTitle: {
     fontSize: 14,
     marginTop: 6,
     fontFamily: 'Pretendard-Regular',
     color: '#000',
-    alignSelf: 'flex-start', // 왼쪽 정렬
-    marginLeft: 6, // 왼쪽 여백 추가
+    alignSelf: 'flex-start',
+    marginLeft: 6,
   },
   itemPrice: {
     fontSize: 16,
     color: '#000',
     fontFamily: 'Pretendard-Bold',
-    alignSelf: 'flex-start', // 왼쪽 정렬
-    marginLeft: 6, // 왼쪽 여백 추가
+    alignSelf: 'flex-start',
+    marginLeft: 6,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: -8,
+    right: -4,
+    width: 24,
+    height: 24,
+    borderRadius: 14,
+    backgroundColor: '#000', // 검정색 배경
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonIcon: {
+    width: 15,
+    height: 2,
+    backgroundColor: '#fff', // 흰색 대시
+    borderRadius: 1,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemInvisible: {
+    backgroundColor: 'transparent',
   },
 });
-
-
 
 export default Goods;

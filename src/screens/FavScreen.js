@@ -1,13 +1,22 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import Goods from '../components/Goods';
 import {AuthContext} from '../components/Auth/AuthContext';
 import {fetchDataAfterLogin} from '../components/API/fetchDataAfterLogin';
+import {deleteData} from '../components/API/deleteData';
 
 const FavScreen = () => {
   const {token} = useContext(AuthContext);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
   useEffect(() => {
@@ -26,14 +35,41 @@ const FavScreen = () => {
     loadItems();
   }, [token]);
 
+  const handleDelete = async itemId => {
+    try {
+      const success = await deleteData('mypage/like', token, itemId);
+      if (success) {
+        setItems(prevItems => prevItems.filter(item => item.id !== itemId)); // UI에서 삭제된 항목 제거
+      } else {
+        Alert.alert('삭제 실패', '항목을 삭제할 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('삭제 실패:', error);
+      Alert.alert('삭제 실패', '항목을 삭제할 수 없습니다.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
-          <Text style={styles.text}>찜</Text>
-          <Goods items={items} />
+          {/* 헤더 부분 */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.text}>찜</Text>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setIsEditing(prev => !prev)} // 편집 모드 토글
+            >
+              <Text style={styles.editButtonText}>
+                {isEditing ? '완료' : '편집'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Goods 컴포넌트 */}
+          <Goods items={items} onDelete={isEditing ? handleDelete : null} />
         </>
       )}
     </View>
