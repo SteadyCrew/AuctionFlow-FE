@@ -68,7 +68,12 @@ const MyDealScreen = () => {
   // 구매/판매 필터 토글
   const toggleFilter = () => {
     setIsBuying(prev => !prev);
+    setSelectedTab('전체 목록'); // 탭을 기본값으로 설정
   };
+
+  const tabs = isBuying
+    ? ['전체 목록', '구매 중', '구매 완료']
+    : ['전체 목록', '판매 중', '판매 완료'];
 
   return (
     <View style={styles.container}>
@@ -89,7 +94,8 @@ const MyDealScreen = () => {
       </View>
       <View style={styles.tabContainer}>
         <GoodsTab
-          tabs={['전체 목록', '구매 중', '구매 완료']}
+          tabs={tabs}
+          selectedTab={selectedTab}
           onTabPress={handleTabPress}
         />
       </View>

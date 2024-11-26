@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-const GoodsTab = ({ tabs, onTabPress }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0]);
-
-  const handleTabPress = (tab) => {
-    setActiveTab(tab);
-    onTabPress(tab); // 선택한 탭에 대한 동작을 부모 컴포넌트에 전달
-  };
-
+const GoodsTab = ({tabs, selectedTab, onTabPress}) => {
   return (
     <View style={styles.tabContainer}>
-      {tabs.map((tab) => (
+      {tabs.map(tab => (
         <TouchableOpacity
           key={tab}
-          style={[styles.tab, activeTab === tab && styles.activeTab]}
-          onPress={() => handleTabPress(tab)}
+          style={[styles.tab, selectedTab === tab && styles.activeTab]} // 부모에서 전달된 selectedTab 확인
+          onPress={() => onTabPress(tab)} // 클릭 시 부모의 상태 업데이트
         >
-          <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              selectedTab === tab && styles.activeTabText,
+            ]}>
             {tab}
           </Text>
         </TouchableOpacity>
