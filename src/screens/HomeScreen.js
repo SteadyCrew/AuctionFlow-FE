@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import axios from 'axios';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
-import {BASE_URL} from '../config/api';
+import {getData} from '../components/API/getData';
 
 const HomeScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
@@ -43,6 +42,40 @@ const HomeScreen = ({navigation}) => {
 
     return unsubscribe; // 컴포넌트가 unmount되면 listener 해제
   }, [navigation]);
+
+  // 컴포넌트가 마운트될 때 API로부터 데이터 가져오기
+  useEffect(() => {
+    const loadItems = async () => {
+      setLoading(true);
+
+      try {
+        let endpoint = '';
+        switch (selectedTab) {
+          case '랭킹':
+            endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
+            break;
+          case '전체목록':
+            endpoint = 'items'; // 전체 목록 API
+            break;
+          case '판매목록':
+            endpoint = 'items/end'; // 판매 목록 API
+            break;
+          default:
+            console.error('알 수 없는 탭입니다:', selectedTab);
+            return;
+        }
+
+        const data = await getData(endpoint); // API 요청
+        setItems(data);
+      } catch (error) {
+        console.error('데이터 가져오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadItems();
+  }, [selectedTab]); // selectedTab이 변경될 때마다 호출
 
   const handleTabPress = tab => {
     setSelectedTab(tab);

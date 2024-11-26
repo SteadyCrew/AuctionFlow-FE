@@ -1,9 +1,20 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { View, Text, Image, ScrollView, ActivityIndicator, TextInput, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AuthContext} from '../components/Auth/AuthContext';
+import {fetchDataAfterLogin} from '../components/API/fetchDataAfterLogin';
 
 const ProductScreen = () => {
   const route = useRoute();
@@ -18,15 +29,17 @@ const ProductScreen = () => {
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
-  const { token } = useContext(AuthContext); 
+  const {token} = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`http://3.35.1.149:8080/items/${itemId}`, {
-        });
+        const response = await axios.get(
+          `http://3.35.1.149:8080/items/${itemId}`,
+          {},
+        );
         setProduct(response.data);
       } catch (error) {
         setError('상품 정보가 존재하지 않습니다');
@@ -35,8 +48,32 @@ const ProductScreen = () => {
       }
     };
 
-    fetchProductDetails(); 
+    fetchProductDetails();
   }, [itemId]);
+
+  useEffect(() => {
+    const loadItems = async () => {
+      if (!token) {
+        console.error('Token이 없습니다.'); // token이 없으면 요청하지 않음
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const formattedItems = await fetchDataAfterLogin('mypage/like', token); // token 전달
+
+        // Check if the itemId exists in items
+        const isFavorited = formattedItems.some(item => item.id === itemId); // itemId가 있는지 확인
+        setIsFavorited(isFavorited);
+      } catch (error) {
+        console.error('데이터 가져오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadItems();
+  }, [token, itemId]);
 
   useEffect(() => {
     const fetchBids = async () => {
@@ -47,9 +84,9 @@ const ProductScreen = () => {
             headers: {
               Authorization: `Bearer ${token}`, // 인증 토큰 추가
             },
-          }
+          },
         );
-        
+
         // 입찰 내역을 최신 순으로 정렬 (내림차순)
         const sortedBids = response.data.sort((a, b) => b.bidId - a.bidId);
         setBids(sortedBids);
@@ -62,30 +99,30 @@ const ProductScreen = () => {
       setStartPrice(itemStartPrice); // 시작 가격 상태 업데이트
 
       } catch (error) {
-        console.error("입찰 내역 불러오기 실패:", error);
+        console.error('입찰 내역 불러오기 실패:', error);
         if (error.response) {
           if (error.response.status === 403) {
-            Alert.alert("권한이 없습니다. 다시 로그인 해주세요.");
+            Alert.alert('권한이 없습니다. 다시 로그인 해주세요.');
           } else {
-            Alert.alert("입찰 내역을 불러오지 못했습니다.");
+            Alert.alert('입찰 내역을 불러오지 못했습니다.');
           }
         }
       }
     };
-  
+
     fetchBids(); // fetchBids 함수 호출
   }, [itemId, token]); // itemId나 token이 변경될 때마다 호출
-  
+
   const handleBidSubmit = async () => {
     // 입찰 금액 유효성 검사
     if (bidError || !bidAmount) {
-      Alert.alert("입찰 금액이 유효하지 않습니다.");
+      Alert.alert('입찰 금액이 유효하지 않습니다.');
       return;
     }
-  
+
     // 토큰이 없는 경우 체크
     if (!token) {
-      Alert.alert("로그인이 필요합니다.");
+      Alert.alert('로그인이 필요합니다.');
       return;
     }
   
@@ -103,7 +140,7 @@ const ProductScreen = () => {
     try {
       const response = await axios.post(
         `http://3.35.1.149:8080/auction/bid`,
-        null,  // 데이터 본문은 비어있으므로 null로 설정
+        null, // 데이터 본문은 비어있으므로 null로 설정
         {
           params: {
             itemId,
@@ -112,10 +149,10 @@ const ProductScreen = () => {
           headers: {
             Authorization: `Bearer ${token}`, // 헤더에 토큰 추가
           },
-        }
+        },
       );
-  
-      Alert.alert("입찰이 성공적으로 완료되었습니다.");
+
+      Alert.alert('입찰이 성공적으로 완료되었습니다.');
       setBidAmount(''); // 입력 필드 초기화
       setBidError(''); // 오류 메시지 초기화
   
@@ -134,13 +171,17 @@ const ProductScreen = () => {
       });
   
     } catch (error) {
-      console.error("입찰 실패 에러: ", error);
-  
+      console.error('입찰 실패 에러: ', error);
+
       if (error.response) {
+        // 서버에서 응답을 받았을 때
+        console.error('응답 오류:', error.response);
+
+        // 403 오류에 대한 세부 메시지 처리
         if (error.response.status === 403) {
-          Alert.alert("권한이 없습니다. 다시 시도해 주세요.");
+          Alert.alert('권한이 없습니다. 다시 시도해 주세요.');
         } else {
-          Alert.alert(error.response?.data?.message || "입찰에 실패했습니다.");
+          Alert.alert(error.response?.data?.message || '입찰에 실패했습니다.');
         }
       } else if (error.request) {
         Alert.alert("서버 응답이 없습니다. 다시 시도해주세요.");
@@ -149,13 +190,22 @@ const ProductScreen = () => {
       }
     }
   };
-  
 
-  
+        // 요청이 보내졌지만 응답이 없을 때
+        console.error('요청 오류:', error.request);
+        Alert.alert('서버 응답이 없습니다. 다시 시도해주세요.');
+      } else {
+        // 다른 오류 발생 시
+        console.error('에러 메시지:', error.message);
+        Alert.alert('입찰에 실패했습니다.');
+      }
+    }
+  };
+
   // 입찰 금액 유효성 검사 함수
-  const validateBidAmount = (value) => {
+  const validateBidAmount = value => {
     const parsedBidAmount = parseInt(value, 10);
-    
+
     // 숫자가 아니거나 100의 배수가 아니면 오류 메시지 설정
     if (isNaN(parsedBidAmount) || parsedBidAmount % 100 !== 0) {
       setBidError('입찰 금액은 100원 단위로 가능합니다.');
@@ -163,14 +213,13 @@ const ProductScreen = () => {
       setBidError('');
     }
   };
-  
+
   // 입찰 금액 변화 처리
-  const handleBidAmountChange = (value) => {
+  const handleBidAmountChange = value => {
     const sanitizedValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
     setBidAmount(sanitizedValue);
     validateBidAmount(sanitizedValue); // 유효성 검사
   };
-  
 
   const handleNextImage = () => {
     if (
@@ -325,7 +374,6 @@ const ProductScreen = () => {
             )}
           </View>
       </View>
-      
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
         <View style={styles.bidInputContainer}>
@@ -450,6 +498,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color:'#000',
     marginBottom : 12,
+    color: '#000',
+    marginBottom: 8,
   },
 
   bidAmount: {
@@ -457,10 +507,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     textAlign: 'center',  // 텍스트 수평 중앙 정렬
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 16,
+    color: '#000',
   },
   recentPrice: {
     flexDirection: 'row',
-    flexWrap: 'wrap',         // 여러 줄로 자동 배치되게 함
+    flexWrap: 'wrap', // 여러 줄로 자동 배치되게 함
     justifyContent: 'space-between', // 항목 사이에 공간을 고르게 배치
   },
   recentBid: {
@@ -472,6 +525,8 @@ const styles = StyleSheet.create({
   bidBlock: {
     width: '49%',            // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
     padding: 12,
+    width: '48%', // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
+    padding: 10,
     marginBottom: 8,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
