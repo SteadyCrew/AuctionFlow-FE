@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#5DADE2', // 선택된 탭의 배경색
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: 'Pretendard-Regular',
     color: '#000',
   },

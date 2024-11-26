@@ -292,19 +292,27 @@ const ProductScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.imageGallery}>
-        <TouchableOpacity
-          onPress={handlePrevImage}
-          style={[styles.arrowButton, styles.leftArrow]}>
-          <Text style={styles.arrowText}>‹</Text>
-        </TouchableOpacity>
-        <Image source={{uri: imageUrl}} style={styles.productImage} />
-        <TouchableOpacity
-          onPress={handleNextImage}
-          style={[styles.arrowButton, styles.rightArrow]}>
-          <Text style={styles.arrowText}>›</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.imageGallery}>
+      <TouchableOpacity
+        onPress={handlePrevImage}
+        style={[styles.arrowButton, styles.leftArrow]}>
+        <Text style={styles.arrowText}>‹</Text>
+      </TouchableOpacity>
+      <Image source={{ uri: imageUrl }} style={styles.productImage} />
+      
+      {/* 상품이 종료 상태일 때 반투명 검정 화면과 판매 완료 표시 */}
+      {product.itemBidStatus === 'end' && (
+        <View style={styles.overlay}>
+          <Text style={styles.soldOutText}>판매완료</Text>
+        </View>
+      )}
+
+      <TouchableOpacity
+        onPress={handleNextImage}
+        style={[styles.arrowButton, styles.rightArrow]}>
+        <Text style={styles.arrowText}>›</Text>
+      </TouchableOpacity>
+    </View>
 
       {/* 카테고리 및 상품 정보 바 */}
       <View style={styles.infoBar}>
@@ -344,15 +352,16 @@ const ProductScreen = () => {
 
       <View style={styles.separator} />
       
-      <View style={styles.bidContainer}>
-        <Text style={styles.bidLabel}>최근 제시가</Text>
+      {product.itemBidStatus !== 'end' ? (
+      <>
+        <View style={styles.bidContainer}>
+          <Text style={styles.bidLabel}>최근 제시가</Text>
           <View style={styles.recentPrice}>
             {bids.length > 0 ? (
               bids.map((bid, index) => (
                 <View
                   key={bid.bidId}
-                  style={[styles.bidBlock, index === 0 && styles.recentBid]} // 가장 최근 입찰에 스타일 적용
-                >
+                  style={[styles.bidBlock, index === 0 && styles.recentBid]}>
                   <Text style={styles.bidAmount}>
                     {bid.bidAmount.toLocaleString()} 원
                   </Text>
@@ -362,24 +371,31 @@ const ProductScreen = () => {
               <Text style={styles.noBids}>입찰 금액이 아직 존재하지 않습니다.</Text>
             )}
           </View>
-      </View>
-      <View style={styles.bidContainer}>
-        <Text style={styles.bidLabel}>입찰제안</Text>
-        <View style={styles.bidInputContainer}>
-          <TextInput
-            placeholder="입찰 제시가를 입력해주세요."
-            value={bidAmount}
-            onChangeText={handleBidAmountChange}
-            style={styles.bidInput}
-            keyboardType="numeric" // 숫자 키보드만 표시
-          />
-          <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
-            <Text style={styles.buttonText}>등 록</Text>
-          </TouchableOpacity>
         </View>
-        {bidError ? <Text style={styles.error}>{bidError}</Text> : null}
+
+        <View style={styles.bidContainer}>
+          <Text style={styles.bidLabel}>입찰제안</Text>
+          <View style={styles.bidInputContainer}>
+            <TextInput
+              placeholder="입찰 제시가를 입력해주세요."
+              value={bidAmount}
+              onChangeText={handleBidAmountChange}
+              style={styles.bidInput}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
+              <Text style={styles.buttonText}>등 록</Text>
+            </TouchableOpacity>
+          </View>
+          {bidError ? <Text style={styles.error}>{bidError}</Text> : null}
+        </View>
+      </>
+    ) : (
+      <View style={styles.closedNotice}>
+        <Text style={styles.closedText}>이 상품은 판매 종료되었습니다.</Text>
       </View>
-    </ScrollView>
+    )}
+  </ScrollView>
   );
 };
 
@@ -394,17 +410,19 @@ const styles = StyleSheet.create({
   },
   arrowButton: {
     position: 'absolute',
-    top: '50%',
+    top: '45%',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     borderRadius: 50,
     padding: 8,
   },
   leftArrow: {
-    left: 5,
+    left: 10,
   },
   rightArrow: {
-    right: 5,
+    right: 10,
   },
   arrowText: {
     fontSize: 24,
@@ -414,6 +432,26 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 1, // 1:1 비율 설정
     resizeMode: 'cover',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검정
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  soldOutText: {
+    fontFamily: 'Pretendard-SemiBold',
+    color: '#fff',
+    fontSize: 20,
+    backgroundColor: 'rgba(204, 204, 204, 0.8)', // 반투명 회색
+    paddingHorizontal:20,
+    paddingVertical: 4,
+    borderRadius:20,
   },
   priceRow: {
     flexDirection: 'row',
@@ -552,6 +590,15 @@ const styles = StyleSheet.create({
   },
   noBids: {
     fontFamily: 'Pretendard-SemiBold',
+    fontSize: 16,
+  },
+  closedNotice: {
+    alignItems: 'center',
+    marginTop:40,
+  },
+  closedText: {
+    fontFamily: 'Pretendard-Bold',
+    color: '#909090',
     fontSize: 16,
   },
   error: {

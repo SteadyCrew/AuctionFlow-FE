@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: 'Pretendard-Bold',
     paddingHorizontal: 24,
-    paddingBottom: 18,
   },
 });
 
