@@ -32,6 +32,10 @@ function SearchScreen() {
           <Text style={styles.cancelButtonText}>취소</Text>
         </TouchableOpacity>
       </View>
+
+        <View style={styles.searchContainer}>
+          <Text style={styles.searchText}>키워드를 입력해 원하는 상품을 찾아보세요!</Text>
+        </View>
     </View>
   );
 }
@@ -66,6 +70,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Pretendard-Regular',
   },
+  searchContainer: {
+    flex: 1,
+    alignItems: 'center', // 수평 중앙 정렬
+    backgroundColor: '#fff',
+  },
+  searchText: {
+    fontSize: 16,
+    color: '#000',
+    fontFamily: 'Pretendard-Regular',
+    textAlign: 'center',
+    marginTop: 10,
+  }
 });
 
 export default SearchScreen;

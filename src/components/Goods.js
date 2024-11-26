@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     position: 'relative', // 삭제 버튼을 절대 위치로 배치하기 위해 필요
   },
   itemImage: {
-    width: windowWidth / (numColumns + 0.65),
-    height: windowWidth / (numColumns + 0.6),
+    width: windowWidth / (numColumns + 0.6), // 1:1 비율을 위해 너비에 맞춘 높이 설정
+    height: windowWidth / (numColumns + 0.6), // 너비와 동일한 높이로 설정
     resizeMode: 'cover',
     borderRadius: 8,
   },

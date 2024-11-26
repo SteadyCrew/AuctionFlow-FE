@@ -23,6 +23,8 @@ const ProductScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bids, setBids] = useState([]);
+  const [highestBid, setHighestBid] = useState('');
+  const [startPrice, setStartPrice]= useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [bidError, setBidError] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -88,6 +90,14 @@ const ProductScreen = () => {
         // 입찰 내역을 최신 순으로 정렬 (내림차순)
         const sortedBids = response.data.sort((a, b) => b.bidId - a.bidId);
         setBids(sortedBids);
+
+              // 시작 가격과 현재 최고 입찰 금액을 비교
+      const highestBid = sortedBids[0]?.bidAmount || 0;
+      const itemStartPrice = response.data.itemStartPrice; // 상품의 시작 가격을 받아오는 부분 추가
+
+      setHighestBid(highestBid); // 최고 입찰 금액 상태 업데이트
+      setStartPrice(itemStartPrice); // 시작 가격 상태 업데이트
+
       } catch (error) {
         console.error('입찰 내역 불러오기 실패:', error);
         if (error.response) {
@@ -115,7 +125,18 @@ const ProductScreen = () => {
       Alert.alert('로그인이 필요합니다.');
       return;
     }
-
+  
+    // 입찰 금액이 시작 가격보다 낮거나 현재 최고 입찰 금액보다 낮으면 경고
+    if (parseInt(bidAmount, 10) < startPrice) {
+      Alert.alert(`입찰 금액은 시작 가격(${startPrice}원) 이상이어야 합니다.`);
+      return;
+    }
+  
+    if (parseInt(bidAmount, 10) <= highestBid) {
+      Alert.alert(`현재 최고 입찰 금액(${highestBid}원)보다 높은 금액을 제시해야 합니다.`);
+      return;
+    }
+  
     try {
       const response = await axios.post(
         `http://3.35.1.149:8080/auction/bid`,
@@ -134,6 +155,21 @@ const ProductScreen = () => {
       Alert.alert('입찰이 성공적으로 완료되었습니다.');
       setBidAmount(''); // 입력 필드 초기화
       setBidError(''); // 오류 메시지 초기화
+  
+      // 입찰 성공 시, 새로운 입찰을 bids 배열 맨 앞에 추가
+      setBids(prevBids => {
+        const updatedBids = [
+          { bidAmount: parseInt(bidAmount, 10), bidId: response.data.bidId },
+          ...prevBids
+        ];
+        
+        // 최고 입찰 금액 갱신
+        const newHighestBid = updatedBids[0]?.bidAmount || 0;
+        setHighestBid(newHighestBid); // 최고 입찰 금액 상태 업데이트
+  
+        return updatedBids;
+      });
+  
     } catch (error) {
       console.error('입찰 실패 에러: ', error);
 
@@ -148,6 +184,13 @@ const ProductScreen = () => {
           Alert.alert(error.response?.data?.message || '입찰에 실패했습니다.');
         }
       } else if (error.request) {
+        Alert.alert("서버 응답이 없습니다. 다시 시도해주세요.");
+      } else {
+        Alert.alert("입찰에 실패했습니다.");
+      }
+    }
+  };
+
         // 요청이 보내졌지만 응답이 없을 때
         console.error('요청 오류:', error.request);
         Alert.alert('서버 응답이 없습니다. 다시 시도해주세요.');
@@ -280,6 +323,7 @@ const ProductScreen = () => {
       </View>
 
       <View style={styles.detailsContainer}>
+          <Text style={styles.productTitle}>{product.title}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.productPrice}>
             {product.startingBid
@@ -295,10 +339,6 @@ const ProductScreen = () => {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.productInfo}>
-          <Text style={styles.productLabel}>상품명</Text>
-          <Text style={styles.productTitle}>{product.title}</Text>
-        </View>
 
         <View style={styles.productInfo}>
           <Text style={styles.productLabel}>상품 상태</Text>
@@ -309,45 +349,43 @@ const ProductScreen = () => {
           <Text style={styles.productLabel}>상품 설명 </Text>
         </View>
         <Text style={styles.productDescription}>{product.description}</Text>
+
+        
       </View>
 
       <View style={styles.separator} />
+      
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>최근 제시가</Text>
-        {bids.length > 0 ? (
           <View style={styles.recentPrice}>
-            {bids.map((bid, index) => (
-              <View
-                key={bid.bidId}
-                style={[
-                  styles.bidBlock,
-                  index === 0 && styles.recentBid, // 가장 최근 입찰에 스타일 적용
-                ]}>
-                <Text style={styles.bidAmount}>
-                  {bid.bidAmount.toLocaleString()}원
-                </Text>
-              </View>
-            ))}
+            {bids.length > 0 ? (
+              bids.map((bid, index) => (
+                <View
+                  key={bid.bidId}
+                  style={[styles.bidBlock, index === 0 && styles.recentBid]} // 가장 최근 입찰에 스타일 적용
+                >
+                  <Text style={styles.bidAmount}>
+                    {bid.bidAmount.toLocaleString()} 원
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noBids}>입찰 금액이 아직 존재하지 않습니다.</Text>
+            )}
           </View>
-        ) : (
-          <Text style={styles.noBids}>입찰 금액이 아직 존재하지 않습니다.</Text>
-        )}
       </View>
-
-      <View style={styles.separator} />
-
       <View style={styles.bidContainer}>
         <Text style={styles.bidLabel}>입찰제안</Text>
         <View style={styles.bidInputContainer}>
           <TextInput
-            placeholder="입찰 금액"
+            placeholder="입찰 제시가를 입력해주세요."
             value={bidAmount}
             onChangeText={handleBidAmountChange}
             style={styles.bidInput}
             keyboardType="numeric" // 숫자 키보드만 표시
           />
           <TouchableOpacity style={styles.button} onPress={handleBidSubmit}>
-            <Text style={styles.buttonText}>등록</Text>
+            <Text style={styles.buttonText}>등 록</Text>
           </TouchableOpacity>
         </View>
         {bidError ? <Text style={styles.error}>{bidError}</Text> : null}
@@ -412,8 +450,8 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     paddingHorizontal: 24,
-    marginTop: 18,
-    marginBottom: 18,
+    marginTop: 20,
+    marginBottom: 20,
   },
   productPrice: {
     fontFamily: 'Pretendard-Bold',
@@ -429,15 +467,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   productLabel: {
-    width: 80, // 고정된 너비 설정
+    marginRight: 20,
     fontFamily: 'Pretendard-Regular',
     fontSize: 16,
     color: '#909090',
   },
   productTitle: {
     fontFamily: 'Pretendard-SemiBold',
-    fontSize: 16,
+    fontSize: 20,
     color: '#000',
+    marginBottom: 2,
   },
   productStatus: {
     fontFamily: 'Pretendard-SemiBold',
@@ -451,16 +490,23 @@ const styles = StyleSheet.create({
   },
   bidContainer: {
     paddingHorizontal: 24,
-    marginTop: 28,
-    marginBottom: 20,
+    marginTop: 18,
+    marginBottom: 28,
   },
   bidLabel: {
     fontFamily: 'Pretendard-SemiBold',
     fontSize: 18,
+    color:'#000',
+    marginBottom : 12,
     color: '#000',
     marginBottom: 8,
   },
+
   bidAmount: {
+    fontFamily: 'Pretendard-SemiBold',
+    fontSize: 16,
+    color: '#000',
+    textAlign: 'center',  // 텍스트 수평 중앙 정렬
     fontFamily: 'Pretendard-Regular',
     fontSize: 16,
     color: '#000',
@@ -471,11 +517,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // 항목 사이에 공간을 고르게 배치
   },
   recentBid: {
+    alignItems: 'center',
     borderColor: '#5DADE2', // 가장 최근 입찰의 테두리 색
-    borderWidth: 1.5, // 테두리 두께
+    borderWidth: 2, // 테두리 두께
     backgroundColor: '#f9f9f9',
   },
   bidBlock: {
+    width: '49%',            // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
+    padding: 12,
     width: '48%', // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
     padding: 10,
     marginBottom: 8,
@@ -487,19 +536,21 @@ const styles = StyleSheet.create({
   bidInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: 30,
   },
   bidInput: {
     flex: 1,
+    marginTop: -10,
     marginRight: 20, // 입력 칸과 버튼 간의 간격
     borderBottomWidth: 1, // 아래쪽에만 테두리 두께 설정
     borderBottomColor: '#C0C0C0', // 아래쪽 테두리 색상
     height: 44,
     fontFamily: 'Pretendard-Regular',
-    fontSize: 14,
+    fontSize: 16,
     backgroundColor: '#FFFFFF',
   },
   button: {
-    borderRadius: 50,
+    borderRadius: 8,
     padding: 6,
     width: '18%',
     alignItems: 'center',
@@ -509,6 +560,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
     textAlign: 'center',
+  },
+  noBids: {
+    fontFamily: 'Pretendard-SemiBold',
+    fontSize: 16,
   },
   error: {
     color: 'red',

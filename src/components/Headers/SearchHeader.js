@@ -14,7 +14,7 @@ const SearchHeader = () => {
 
   const handleCancel = () => {
     setSearchTerm('');
-    navigation.goBack();
+    navigation.navigate('Home');
   };
 
   return (
