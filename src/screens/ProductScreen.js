@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   },
   closedNotice: {
     alignItems: 'center',
-    marginTop:40,
+    margin:40,
   },
   closedText: {
     fontFamily: 'Pretendard-Bold',
