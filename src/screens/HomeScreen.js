@@ -18,7 +18,7 @@ const HomeScreen = () => {
         let endpoint = '';
         switch (selectedTab) {
           case '랭킹':
-            endpoint = 'items/selling'; // 랭킹 데이터 API
+            endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
             break;
           case '전체목록':
             endpoint = 'items'; // 전체 목록 API
