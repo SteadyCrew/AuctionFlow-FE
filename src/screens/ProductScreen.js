@@ -31,6 +31,28 @@ const ProductScreen = () => {
   const [isFavorited, setIsFavorited] = useState(false);
   const {token} = useContext(AuthContext);
 
+    // categoryId를 categoryName으로 변환하는 함수
+    const getCategoryName = (categoryId) => {
+      switch (categoryId) {
+        case 1: return '의류';
+        case 2: return '패션 액세서리';
+        case 3: return '전자기기';
+        case 4: return '스포츠/레저';
+        case 5: return '차량/오토바이';
+        case 6: return '스타굿즈';
+        case 7: return '음반/악기';
+        case 8: return '도서/티켓/문구';
+        case 9: return '뷰티/미용';
+        case 10: return '가구/인테리어';
+        case 11: return '생활/주방용품';
+        case 12: return '공구/산업용품';
+        case 13: return '식품';
+        case 14: return '유아동/출산';
+        case 15: return '반려동물 용품';
+        case 16: return '기타';
+        default: return '기타'; // default 값을 설정
+      }
+    };
   useEffect(() => {
     const fetchProductDetails = async () => {
       setLoading(true);
@@ -316,7 +338,7 @@ const ProductScreen = () => {
 
       {/* 카테고리 및 상품 정보 바 */}
       <View style={styles.infoBar}>
-        <Text style={styles.productCategory}>#{product.categoryId}</Text>
+        <Text style={styles.productCategory}>#{getCategoryName(product.categoryId)}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -472,7 +494,7 @@ const styles = StyleSheet.create({
   productCategory: {
     paddingHorizontal: 24,
     fontFamily: 'Pretendard-Regular',
-    fontSize: 16,
+    fontSize: 14,
     color: '#fff',
   },
   detailsContainer: {
