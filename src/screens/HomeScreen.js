@@ -54,10 +54,10 @@ const HomeScreen = ({navigation}) => {
           case '랭킹':
             endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
             break;
-          case '전체목록':
+          case '전체 목록':
             endpoint = 'items'; // 전체 목록 API
             break;
-          case '판매목록':
+          case '판매 종료':
             endpoint = 'items/end'; // 판매 목록 API
             break;
           default:
@@ -94,14 +94,14 @@ const HomeScreen = ({navigation}) => {
             <Goods items={items} />
           </View>
         );
-      case '전체목록':
+      case '전체 목록':
         return (
           <View>
             <Text style={styles.text}>전체 목록</Text>
             <Goods items={items} />
           </View>
         );
-      case '판매목록':
+      case '판매 종료':
         return (
           <View>
             <Text style={styles.text}>판매 종료</Text>
@@ -117,7 +117,7 @@ const HomeScreen = ({navigation}) => {
     <View style={styles.container}>
       <View style={styles.tabContainer}>
         <HomeTab
-          tabs={['랭킹', '전체목록', '판매목록']}
+          tabs={['랭킹', '전체 목록', '판매 종료']}
           onTabPress={handleTabPress}
         />
       </View>

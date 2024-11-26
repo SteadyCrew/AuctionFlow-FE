@@ -114,16 +114,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 10,
+    paddingHorizontal: 24,
   },
   tabContainer: {
     paddingTop: 18,
+    paddingHorizontal: 24,
   },
   contentContainer: {
     paddingTop: 18,

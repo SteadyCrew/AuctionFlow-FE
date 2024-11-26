@@ -191,17 +191,6 @@ const ProductScreen = () => {
     }
   };
 
-        // 요청이 보내졌지만 응답이 없을 때
-        console.error('요청 오류:', error.request);
-        Alert.alert('서버 응답이 없습니다. 다시 시도해주세요.');
-      } else {
-        // 다른 오류 발생 시
-        console.error('에러 메시지:', error.message);
-        Alert.alert('입찰에 실패했습니다.');
-      }
-    }
-  };
-
   // 입찰 금액 유효성 검사 함수
   const validateBidAmount = value => {
     const parsedBidAmount = parseInt(value, 10);

@@ -120,20 +120,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   editButtonEditing: {
-    backgroundColor: '#4C8FD4', // "완료" 버튼 배경색
+    backgroundColor: '#5DADE2', // "완료" 버튼 배경색
   },
   editButtonDefault: {
     backgroundColor: 'transparent', // "편집"은 배경 투명
   },
   editButtonTextEditing: {
     color: '#fff', // "완료" 텍스트 색상
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontFamily: 'Pretendard-SemiBold',
   },
   editButtonTextDefault: {
     textDecorationLine: 'underline', // "편집" 텍스트 밑줄
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Pretendard-SemiBold',
     color: '#000', // 검정 텍스트
   },
 });
