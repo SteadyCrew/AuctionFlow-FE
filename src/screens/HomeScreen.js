@@ -3,6 +3,8 @@ import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
 import {getData} from '../components/API/getData';
+import axios from 'axios';
+import {BASE_URL} from '../config/api';
 
 const HomeScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
@@ -20,10 +22,11 @@ const HomeScreen = ({navigation}) => {
       const formattedItems = data.map(item => ({
         id: item.itemId,
         image:
-          item.productImageUrls[0] ||
+          item.productImageUrls?.[0] ||
           'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png',
         title: item.title,
-        price: `${item.startingBid.toLocaleString()}원`,
+        price: `${item.startingBid?.toLocaleString() || 0}원`,
+        itemBidStatus: item.itemBidStatus, // itemBidStatus 추가, 기본값은 'active'
       }));
 
       setItems(formattedItems);
@@ -55,10 +58,10 @@ const HomeScreen = ({navigation}) => {
             endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
             break;
           case '전체 목록':
-            endpoint = 'items'; // 전체 목록 API
+            endpoint = 'items/selling'; // 전체 목록 API
             break;
           case '판매 종료':
-            endpoint = 'items/end'; // 판매 목록 API
+            endpoint = 'items/end'; // 판매 종료 API
             break;
           default:
             console.error('알 수 없는 탭입니다:', selectedTab);
@@ -67,6 +70,7 @@ const HomeScreen = ({navigation}) => {
 
         const data = await getData(endpoint); // API 요청
         setItems(data);
+        console.log(data);
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);
       } finally {

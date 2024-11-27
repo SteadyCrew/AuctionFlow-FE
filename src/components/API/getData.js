@@ -14,6 +14,7 @@ export const getData = async url => {
         'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 기본 이미지 사용
       title: item.title,
       price: `₩${item.startingBid.toLocaleString()}`, // 가격 포맷팅
+      itemBidStatus: item.itemBidStatus,
     }));
 
     return formattedItems;
