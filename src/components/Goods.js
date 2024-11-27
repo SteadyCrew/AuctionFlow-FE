@@ -121,7 +121,7 @@ const Goods = ({items, onDelete}) => {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingBottom: 140,
+    paddingBottom: 100,
     paddingHorizontal: 24,
   },
   itemContainer: {
@@ -153,25 +153,25 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     position: 'absolute',
-    top: -8,
-    right: 0,
-    width: 24,
-    height: 24,
+    top: -6,
+    right: -2,
+    width: 20,
+    height: 20,
     borderRadius: 14,
     backgroundColor: '#000', // 검정색 배경
     justifyContent: 'center',
     alignItems: 'center',
   },
   deleteButtonIcon: {
-    width: 15,
-    height: 2,
+    width: 8,
+    height: 1.5,
     backgroundColor: '#fff', // 흰색 대시
-    borderRadius: 1,
+    borderRadius: 5,
   },
   deleteButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontFamily: 'Pretendard-Bold',
   },
   itemInvisible: {
     backgroundColor: 'transparent',
@@ -190,10 +190,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   soldOutText: {
-    fontFamily: 'Pretendard-Bold',
+    fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
-    fontSize: 14,
-    backgroundColor: 'rgba(204, 204, 204, 0.8)', // 반투명 회색 배경
+    fontSize: 12,
     paddingHorizontal: 10,
     paddingVertical: 2,
     borderRadius: 12,

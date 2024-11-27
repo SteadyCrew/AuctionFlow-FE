@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 10,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -115,8 +114,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-Bold',
   },
   editButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 14,
     borderRadius: 20,
   },
   editButtonEditing: {

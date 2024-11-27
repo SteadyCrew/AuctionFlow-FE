@@ -342,14 +342,8 @@ const ProductScreen = () => {
       </View>
 
       <View style={styles.detailsContainer}>
+        <View style={styles.productTitleContainer}>
           <Text style={styles.productTitle}>{product.title}</Text>
-        <View style={styles.priceRow}>
-          <Text style={styles.productPrice}>
-            {product.startingBid
-              ? product.startingBid.toLocaleString()
-              : '가격 정보 없음'}{' '}
-            원
-          </Text>
           <TouchableOpacity onPress={handleFavorite} style={styles.heartButton}>
             <Ionicons
               name={isFavorited ? 'heart' : 'heart-outline'} // 채워진 하트 또는 빈 하트
@@ -358,6 +352,15 @@ const ProductScreen = () => {
             />
           </TouchableOpacity>
         </View>
+        <View style={styles.priceRow}>
+          <Text style={styles.productPrice}>
+            {product.startingBid
+              ? product.startingBid.toLocaleString()
+              : '가격 정보 없음'}{' '}
+            원
+          </Text>
+        </View>
+
 
         <View style={styles.productInfo}>
           <Text style={styles.productLabel}>상품 상태</Text>
@@ -394,6 +397,8 @@ const ProductScreen = () => {
             )}
           </View>
         </View>
+
+        <View style={styles.separator} />
 
         <View style={styles.bidContainer}>
           <Text style={styles.bidLabel}>입찰제안</Text>
@@ -432,23 +437,30 @@ const styles = StyleSheet.create({
   },
   arrowButton: {
     position: 'absolute',
-    top: '45%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    top: '50%',
+    justifyContent: 'center',  // 가로 중앙
+    alignItems: 'center',  // 세로 중앙
     zIndex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 50,
-    padding: 8,
+    width: 30,  // 버튼 크기 조정
+    height: 50,  // 버튼 크기 조정
   },
+  
   leftArrow: {
-    left: 10,
+    left: 5,
   },
+  
   rightArrow: {
-    right: 10,
+    right: 5,
   },
+  
   arrowText: {
+    fontFamily: 'Pretendard-Regular',
     fontSize: 24,
-    color: '#333',
+    color: '#fff',
+    lineHeight: 30,  // 버튼 높이와 일치시켜서 세로 중앙에 위치
+    textAlign: 'center',  // 텍스트 가로 중앙
   },
   productImage: {
     width: '100%',
@@ -464,36 +476,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검정
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 5,
   },
   soldOutText: {
+    position: 'absolute',
+    top: '50%',
     fontFamily: 'Pretendard-SemiBold',
-    color: '#fff',
-    fontSize: 20,
-    backgroundColor: 'rgba(204, 204, 204, 0.8)', // 반투명 회색
-    paddingHorizontal:20,
-    paddingVertical: 4,
+    color: 'rgba(255, 255, 255, 0.8)', 
+    fontSize: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // 반투명 검정
+    padding: 6,
+    paddingHorizontal: 20,
     borderRadius:20,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  heartButton: {
-    marginLeft: 10,
-    marginBottom: 18,
   },
   infoBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#5DADE2',
-    height: 40,
+    height: 42,
   },
   productCategory: {
     paddingHorizontal: 24,
-    fontFamily: 'Pretendard-Regular',
+    fontFamily: 'Pretendard-SemiBold',
     fontSize: 14,
     color: '#fff',
   },
@@ -502,55 +505,72 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
-  productPrice: {
-    fontFamily: 'Pretendard-Bold',
-    fontSize: 24,
-    letterSpacing: -0.5,
-    color: '#000',
-    marginBottom: 18,
-  },
-
-  productInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  productLabel: {
-    marginRight: 20,
-    fontFamily: 'Pretendard-Regular',
-    fontSize: 16,
-    color: '#909090',
+  productTitleContainer: {
+    flexDirection: 'row',  // 제목과 하트 버튼을 가로로 배치
+    justifyContent: 'space-between',  // 제목과 하트 버튼 간의 간격을 자동으로 맞춤
+    alignItems: 'center',  // 세로로 가운데 정렬
   },
   productTitle: {
     fontFamily: 'Pretendard-SemiBold',
     fontSize: 20,
     color: '#000',
-    marginBottom: 2,
+    marginBottom: 4,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',  // 가격은 왼쪽에 정렬
+    marginBottom: 18,
+  },
+  productPrice: {
+    fontFamily: 'Pretendard-Bold',
+    fontSize: 22,
+    letterSpacing: -0.3,
+    color: '#000',
+  },
+  heartButton: {
+    marginLeft: 10,  // 하트 버튼과 제목 사이의 간격 조정
+  },
+  
+  productInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  productLabel: {
+    marginRight: 28,
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 15,
+    color: '#555',
   },
   productStatus: {
     fontFamily: 'Pretendard-SemiBold',
-    fontSize: 16,
+    fontSize: 15,
     color: '#000',
   },
   productDescription: {
     fontFamily: 'Pretendard-Regular',
-    fontSize: 16,
+    fontSize: 15,
     color: '#000',
+    lineHeight: 18,  // 줄 간격 좁히기
+    paddingHorizontal: 12,  // 상하 여백 추가
+    paddingVertical: 12,
+    backgroundColor: '#f4f4f4',  // 배경색 추가
+    borderRadius: 12,  // 둥근 모서리
+    marginTop: 4,
   },
   bidContainer: {
     paddingHorizontal: 24,
-    marginTop: 18,
-    marginBottom: 28,
+    marginTop: 20,
+    marginBottom: 20,
   },
   bidLabel: {
     fontFamily: 'Pretendard-SemiBold',
-    fontSize: 18,
+    fontSize: 16,
     color:'#000',
     marginBottom : 12,
     color: '#000',
-    marginBottom: 8,
   },
-
   bidAmount: {
     fontFamily: 'Pretendard-SemiBold',
     fontSize: 16,
@@ -574,34 +594,31 @@ const styles = StyleSheet.create({
   bidBlock: {
     width: '49%',            // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
     padding: 12,
-    width: '48%', // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
+    width: '49%', // 두 개씩 배치되도록 50%로 크기 설정 (간격 고려)
     padding: 10,
     marginBottom: 8,
     backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderRadius: 10,
   },
   bidInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   bidInput: {
-    flex: 1,
-    marginTop: -10,
-    marginRight: 20, // 입력 칸과 버튼 간의 간격
-    borderBottomWidth: 1, // 아래쪽에만 테두리 두께 설정
-    borderBottomColor: '#C0C0C0', // 아래쪽 테두리 색상
-    height: 44,
+    marginRight: 10, // 입력 칸과 버튼 간의 간격
     fontFamily: 'Pretendard-Regular',
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    width: '75%',
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 14,
   },
   button: {
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 6,
-    width: '18%',
+    width: '20%',
     alignItems: 'center',
     backgroundColor: '#5DADE2',
   },
@@ -609,19 +626,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
     textAlign: 'center',
+    fontSize:14,
   },
   noBids: {
-    fontFamily: 'Pretendard-SemiBold',
-    fontSize: 16,
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 15,
+    color:'#555',
   },
   closedNotice: {
     alignItems: 'center',
     margin:40,
   },
   closedText: {
-    fontFamily: 'Pretendard-Bold',
-    color: '#909090',
-    fontSize: 16,
+    fontFamily: 'Pretendard-SemiBold',
+    color: '#555',
+    fontSize: 18,
+    textAlign: 'center',
   },
   error: {
     color: 'red',

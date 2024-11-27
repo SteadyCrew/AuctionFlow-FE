@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../components/Auth/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 
@@ -15,7 +15,7 @@ const MypageScreen = () => {
   
     return unsubscribe;
   }, [navigation]);
-  
+
   // Fetch address from the server as usual
   const fetchAddress = async () => {
     try {
@@ -38,10 +38,9 @@ const MypageScreen = () => {
         console.error('배송지 정보를 불러오는 데 실패했습니다.');
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
-   
 
   // 컴포넌트가 마운트될 때 주소 정보 가져오기
   useEffect(() => {
@@ -52,13 +51,19 @@ const MypageScreen = () => {
     navigation.navigate('AddressScreen');
   };
 
+  // 닉네임 첫 글자 추출
+  const getInitial = (nickname) => {
+    return nickname ? nickname.substring(0, 2).toUpperCase() : ''; // 닉네임의 첫 두 글자만 반환
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{ uri: 'https://your-image-url.com/profile.jpg' }} // 프로필 사진 URL
-          style={styles.profileImage}
-        />
+        <View style={[styles.profileImage, { backgroundColor: '#f1f1f1' }]}>
+          <Text style={styles.profileText}>
+            {getInitial(nickname)}
+          </Text>
+        </View>
         <View style={styles.InfoContainer}>
           <Text style={styles.nickname}>
             {nickname} 님,
@@ -93,7 +98,6 @@ const MypageScreen = () => {
           <Text style={styles.addressText}>배송지를 설정해주세요.</Text>
         )}
       </View>
-
     </View>
   );
 };
@@ -116,10 +120,20 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 50, // 원형 이미지
     marginRight: 18, // 이미지와 텍스트 사이 간격
-    borderWidth: 1, // 테두리 추가
-    borderColor: '#ccc', // 테두리 색상
-    backgroundColor: '#fff', // 흰색 배경으로 테두리와 대비되게
+    justifyContent: 'center', // 세로 중앙 정렬
+    alignItems: 'center', // 가로 중앙 정렬
+    backgroundColor: '#5DADE2', // 배경색 지정
+    display: 'flex', // flexbox 사용
   },
+  
+  profileText: {
+    fontSize: 36,
+    fontFamily: 'Pretendard-Bold',
+    color: '#000',
+    textAlign: 'center', // 텍스트 가로 중앙 정렬
+    lineHeight: 90, // lineHeight를 이미지 크기와 동일하게 설정하여 세로 중앙 정렬
+  },  
+  
   InfoContainer: {
     flexDirection: 'column',
     flex: 1, // 공간을 최대로 사용하게 설정

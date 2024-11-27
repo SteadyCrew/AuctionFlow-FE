@@ -85,28 +85,37 @@ const HomeScreen = ({navigation}) => {
 
   const renderContent = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color="#0000ff" />;
+      return <ActivityIndicator size="large" color="#5DADE2" />;
     }
 
     switch (selectedTab) {
       case '랭킹':
         return (
           <View>
-            <Text style={styles.text}>실시간 인기 순위</Text>
+            <View style={styles.row}>
+              <Text style={styles.text}>랭킹</Text>
+              <Text style={styles.subText}>현재 인기 있는 상품을 찾아보세요!</Text>
+            </View>
             <Goods items={items} />
           </View>
         );
       case '전체 목록':
         return (
           <View>
-            <Text style={styles.text}>전체 목록</Text>
+            <View style={styles.row}>
+              <Text style={styles.text}>전체 목록</Text>
+              <Text style={styles.subText}>상품 전체 목록을 한눈에 둘러보세요.</Text>
+            </View>
             <Goods items={items} />
           </View>
         );
       case '판매 종료':
         return (
           <View>
-            <Text style={styles.text}>판매 종료</Text>
+            <View style={styles.row}>
+              <Text style={styles.text}>판매 종료</Text>
+              <Text style={styles.subText}>판매가 종료된 상품의 적정가를 찾아보세요!</Text>
+            </View>
             <Goods items={items} />
           </View>
         );
@@ -132,19 +141,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+
   },
   tabContainer: {
-    paddingTop: 8,
+    paddingTop: 10,
     paddingHorizontal: 24,
   },
   contentContainer: {
     paddingTop: 18,
   },
+  row: {
+    flexDirection: 'row', // 텍스트를 가로로 정렬
+    paddingHorizontal: 24,
+    alignItems: 'baseline', // 텍스트 기준선을 맞춤
+  },
   text: {
     fontSize: 20,
     color: '#000',
     fontFamily: 'Pretendard-Bold',
-    paddingHorizontal: 24,
+  },
+  subText: {
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 12,
+    color: '#909090', // 작은 텍스트 색상
+    marginLeft: 12, // "실시간 인기 순위"와 간격 추가
   },
 });
 

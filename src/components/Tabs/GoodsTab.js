@@ -28,25 +28,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#F0F0F0',
-    borderRadius: 15,
-    height: 30,
+    borderRadius: 18,
+    height: 28,
   },
   tab: {
     flex: 1,
     alignItems: 'center', // 가로 방향 중앙 정렬
     justifyContent: 'center', // 세로 방향 중앙 정렬
-    borderRadius: 15,
-    height: 30,
+    borderRadius: 18,
   },
   activeTab: {
-    backgroundColor: '#5DADE2',
+    backgroundColor: '#5DADE2', // 선택된 탭의 배경색
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Pretendard-Regular',
-    color: '#000', // 선택되지 않은 탭의 글씨 색상 (검정)
+    color: '#000',
+    lineHeight: 28, // 탭의 높이와 동일하게 설정
+    textAlignVertical: 'center', // 세로 방향 중앙 정렬
   },
   activeTabText: {
+    fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
   },
 });

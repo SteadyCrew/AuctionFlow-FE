@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#F0F0F0',
     borderRadius: 18,
-    height: 30,
+    height: 28,
   },
   tab: {
     flex: 1,
@@ -44,13 +44,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#5DADE2', // 선택된 탭의 배경색
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Pretendard-Regular',
     color: '#000',
+    lineHeight: 28, // 탭의 높이와 동일하게 설정
+    textAlignVertical: 'center', // 세로 방향 중앙 정렬
   },
   activeTabText: {
+    fontFamily: 'Pretendard-SemiBold',
     color: '#fff',
   },
 });
+
 
 export default HomeTab;

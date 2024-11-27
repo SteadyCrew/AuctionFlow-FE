@@ -139,21 +139,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 12, // 좌우 여백 추가
-    borderRadius: 6,
   },
   activeButton: {
-    backgroundColor: '#4C8FD4', // 선택된 색상
+    borderBottomWidth: 2, // 밑줄을 넣어 강조
+    borderBottomColor: '#4C8FD4', // 선택 시 밑줄 색상
   },
   inactiveButton: {
-    backgroundColor: '#E57A7A', // 기본 색상
+    borderBottomWidth: 2,
+    borderBottomColor: '#E57A7A', // 기본 상태 밑줄 색상
   },
   filterButtonText: {
-    color: '#fff',
+    color: '#000', // 텍스트 색상
     fontSize: 14,
     fontFamily: 'Pretendard-Regular',
   },
 });
+
 
 export default MyDealScreen;

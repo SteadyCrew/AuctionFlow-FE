@@ -25,7 +25,11 @@ const SignUpScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>Auction FLOW</Text>
+      <Text style={styles.logoText}>
+        <Text style={styles.largeText}>A</Text>
+        <Text style={styles.smallText}>uction </Text>
+        <Text style={styles.largeText}>FLOW</Text>
+      </Text>
 
       {/* 이메일 입력 필드 */}
       <TextInput
@@ -86,38 +90,41 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontFamily: 'Pretendard-ExtraBold',
-    fontSize: 32,
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#5DADE2',
+  },
+  largeText: {
+    fontSize: 40, // 큰 텍스트 크기
+  },
+  smallText: {
+    fontSize: 14, // 작은 텍스트 크기
   },
   input: {
     width: '90%',
     padding: 12,
     marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
-    borderRadius: 8,
-    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
     fontFamily: 'Pretendard-Regular',
     fontSize: 14,
   },
   signUpButton: {
     backgroundColor: '#5DADE2',
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     width: '90%',
-    marginTop: 30,
+    marginTop: 10,
   },
   signUpButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#FFF',
     fontFamily: 'Pretendard-SemiBold',
   },
   subText: {
     fontFamily: 'Pretendard-Regular',
-    marginTop: 20,
+    marginTop: 8,
     color: '#909090',
     fontSize: 14,
   },

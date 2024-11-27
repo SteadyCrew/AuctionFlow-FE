@@ -451,20 +451,17 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   }, // 대분류
   input: {
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
     padding: 12,
-    height: 44,
+    height: 46,
     borderRadius: 10,
     fontFamily: 'Pretendard-Regular',
     fontSize: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f5f5f5',
   }, // 입력
   textArea: {
     height: 160,
     textAlignVertical: 'top', 
   }, // 설명 입력
-
   //이미지
   formImageGroup: { // 이미지 그룹폼
     paddingHorizontal: 24,
@@ -589,14 +586,12 @@ deleteButtonText: {
     flexDirection: 'row',
   },
   priceinput:{
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
     padding: 12,
-    height: 44,
+    height: 46,
     borderRadius: 10,
     fontFamily: 'Pretendard-Regular',
     fontSize: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f5f5f5',
     flex:1,
   },
 
@@ -608,12 +603,13 @@ deleteButtonText: {
   },
   datePicker: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
-    borderRadius: 10,
     padding: 12,
-    backgroundColor: '#FFFFFF',
-    marginRight: 10,
+    height: 46,
+    borderRadius: 10,
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 14,
+    backgroundColor: '#f5f5f5',
+    marginRight: 8,
   },
   calmodalContainer: {
     flex: 1,
@@ -628,15 +624,15 @@ deleteButtonText: {
     paddingVertical: 18,
     alignItems: 'center',
   },
-
   timePicker: {
     width: 100,
-    borderWidth: 1,
-    borderColor: '#C0C0C0',
-    borderRadius: 10,
     padding: 12,
-    backgroundColor: '#FFFFFF',
-    marginRight: 10,
+    height: 46,
+    borderRadius: 10,
+    fontFamily: 'Pretendard-Regular',
+    fontSize: 14,
+    backgroundColor: '#f5f5f5',
+    marginRight: 8,
   },
   timemodalContainer: {
     flex: 1,
