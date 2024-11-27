@@ -3,6 +3,8 @@ import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import HomeTab from '../components/Tabs/HomeTab';
 import Goods from '../components/Goods';
 import {getData} from '../components/API/getData';
+import axios from 'axios';
+import {BASE_URL} from '../config/api';
 
 const HomeScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState('랭킹');
