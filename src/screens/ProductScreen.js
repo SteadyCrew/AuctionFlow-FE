@@ -193,11 +193,11 @@ const ProductScreen = () => {
       });
   
     } catch (error) {
-      console.error('입찰 실패 에러: ', error);
+      // console.error('입찰 실패 에러: ', error);
 
       if (error.response) {
         // 서버에서 응답을 받았을 때
-        console.error('응답 오류:', error.response);
+        // console.error('응답 오류:', error.response);
 
         // 403 오류에 대한 세부 메시지 처리
         if (error.response.status === 403) {
