@@ -58,10 +58,10 @@ const HomeScreen = ({navigation}) => {
             endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
             break;
           case '전체 목록':
-            endpoint = 'items'; // 전체 목록 API
+            endpoint = 'items/selling'; // 전체 목록 API
             break;
           case '판매 종료':
-            endpoint = 'items/end'; // 판매 목록 API
+            endpoint = 'items/end'; // 판매 종료 API
             break;
           default:
             console.error('알 수 없는 탭입니다:', selectedTab);
