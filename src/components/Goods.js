@@ -29,11 +29,40 @@ const Goods = ({ items, onDelete }) => {
     return data;
   };
 
-  const renderItem = ({ item }) => {
-    if (item.empty) {
-      // 빈 아이템에 대한 렌더링
-      return <View style={[styles.itemContainer, styles.itemInvisible]} />;
-    }
+  // const renderItem = ({item}) => {
+  //   if (item.empty) {
+  //     // 빈 아이템에 대한 렌더링
+  //     return <View style={[styles.itemContainer, styles.itemInvisible]} />;
+  //   }
+  //
+  //   return (
+  //     <View style={styles.itemContainer}>
+  //       {/* 상품 이미지 및 정보 */}
+  //       <TouchableOpacity
+  //         style={{alignItems: 'center'}}
+  //         onPress={() => navigation.navigate('Product', {itemId: item.id})}>
+  //         <Image source={{uri: item.image}} style={styles.itemImage} />
+  //         <Text style={styles.itemTitle}>{item.title}</Text>
+  //         <Text style={styles.itemPrice}>{item.price}</Text>
+  //       </TouchableOpacity>
+  //
+  //       {/* 삭제 버튼 (onDelete가 제공되었을 때만 표시) */}
+  //       {onDelete && (
+  //         <TouchableOpacity
+  //           style={styles.deleteButton}
+  //           onPress={() => {
+  //             onDelete(item.id);
+  //             console.log('삭제할 아이템 ID:', item.id);
+  //           }}>
+  //           <View style={styles.deleteButtonIcon}>
+  //             <Text style={styles.deleteButtonText}>–</Text>
+  //           </View>
+  //         </TouchableOpacity>
+  //       )}
+  //     </View>
+  //   );
+  // };
+    const isSoldOut = item.itemBidStatus === 'end'; // end 상태 확인
 
     return (
       <View style={styles.itemContainer}>
@@ -42,6 +71,12 @@ const Goods = ({ items, onDelete }) => {
           style={{ alignItems: 'center' }}
           onPress={() => navigation.navigate('Product', { itemId: item.id })}>
           <Image source={{ uri: item.image }} style={styles.itemImage} />
+          {/* 종료 상태인 경우 오버레이와 텍스트 추가 */}
+          {isSoldOut && (
+            <View style={styles.overlay}>
+              <Text style={styles.soldOutText}>판매완료</Text>
+            </View>
+          )}
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemPrice}>{item.price}</Text>
         </TouchableOpacity>
@@ -132,6 +167,28 @@ const styles = StyleSheet.create({
   },
   itemInvisible: {
     backgroundColor: 'transparent',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '70%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검정색
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8, // 이미지와 동일한 모서리 둥글기
+    zIndex: 1,
+  },
+  soldOutText: {
+    fontFamily: 'Pretendard-Bold',
+    color: '#fff',
+    fontSize: 14,
+    backgroundColor: 'rgba(204, 204, 204, 0.8)', // 반투명 회색 배경
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 12,
   },
 });
 
