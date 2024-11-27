@@ -13,7 +13,7 @@ export const getData = async url => {
         item.productImageUrls[0] ||
         'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png', // 기본 이미지 사용
       title: item.title,
-      price: `₩${item.startingBid.toLocaleString()}`, // 가격 포맷팅
+      price: `${item.startingBid.toLocaleString()}원`, // 가격 포맷팅
       itemBidStatus: item.itemBidStatus,
     }));
 

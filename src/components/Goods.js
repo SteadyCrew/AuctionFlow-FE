@@ -8,12 +8,12 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const numColumns = 3;
 const windowWidth = Dimensions.get('window').width;
 
-const Goods = ({items, onDelete}) => {
+const Goods = ({ items, onDelete }) => {
   const navigation = useNavigation();
 
   const formatData = (data, numColumn) => {
@@ -22,7 +22,7 @@ const Goods = ({items, onDelete}) => {
 
     // 마지막 행에 빈 공간이 있으면 빈 객체를 추가하여 균등하게 만듦
     while (totalLastRow !== 0 && totalLastRow !== numColumn) {
-      data.push({id: `blank-${totalLastRow}`, empty: true});
+      data.push({ id: `blank-${totalLastRow}`, empty: true });
       totalLastRow++;
     }
 
@@ -62,29 +62,21 @@ const Goods = ({items, onDelete}) => {
   //     </View>
   //   );
   // };
-  const renderItem = ({item}) => {
-    if (item.empty) {
-      // 빈 아이템에 대한 렌더링
-      return <View style={[styles.itemContainer, styles.itemInvisible]} />;
-    }
-
     const isSoldOut = item.itemBidStatus === 'end'; // end 상태 확인
 
     return (
       <View style={styles.itemContainer}>
         {/* 상품 이미지 및 정보 */}
         <TouchableOpacity
-          style={{alignItems: 'center'}}
-          onPress={() => navigation.navigate('Product', {itemId: item.id})}>
-          <Image source={{uri: item.image}} style={styles.itemImage} />
-
+          style={{ alignItems: 'center' }}
+          onPress={() => navigation.navigate('Product', { itemId: item.id })}>
+          <Image source={{ uri: item.image }} style={styles.itemImage} />
           {/* 종료 상태인 경우 오버레이와 텍스트 추가 */}
           {isSoldOut && (
             <View style={styles.overlay}>
               <Text style={styles.soldOutText}>판매완료</Text>
             </View>
           )}
-
           <Text style={styles.itemTitle}>{item.title}</Text>
           <Text style={styles.itemPrice}>{item.price}</Text>
         </TouchableOpacity>

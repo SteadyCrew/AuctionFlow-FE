@@ -55,16 +55,20 @@ const RegisterScreen = () => {
       mediaType: 'photo',
       includeBase64: false,
     });
-
+  
     if (result.didCancel) {
       console.log('User cancelled image picker');
     } else if (result.error) {
       console.error('ImagePicker Error: ', result.error);
     } else {
-      setProductImages([...productImages, { uri: result.assets[0].uri }]);
+      // 고유한 파일 이름을 생성: 타임스탬프 + 랜덤값
+      const uniqueName = `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`; 
+  
+      // 파일 정보와 함께 업데이트
+      setProductImages([...productImages, { uri: result.assets[0].uri, name: uniqueName }]);
     }
   };
-
+  
   const handleImageDelete = (index) => {
     setProductImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
@@ -129,11 +133,14 @@ const RegisterScreen = () => {
   
     formData.append('item', JSON.stringify(itemData));
   
-    productImages.forEach((image, index) => {
+    productImages.forEach((image) => {
+      // 고유한 파일 이름 생성: 타임스탬프 + 랜덤값
+      const uniqueName = `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`; 
+  
       formData.append('images', {
         uri: image.uri,
         type: image.type || 'image/jpeg',
-        name: image.fileName || `image_${index}.jpg`,
+        name: uniqueName, // 고유한 파일 이름을 사용
       });
     });
   
