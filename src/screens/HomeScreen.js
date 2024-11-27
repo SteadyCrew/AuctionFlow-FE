@@ -22,10 +22,11 @@ const HomeScreen = ({navigation}) => {
       const formattedItems = data.map(item => ({
         id: item.itemId,
         image:
-          item.productImageUrls[0] ||
+          item.productImageUrls?.[0] ||
           'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png',
         title: item.title,
-        price: `${item.startingBid.toLocaleString()}원`,
+        price: `${item.startingBid?.toLocaleString() || 0}원`,
+        itemBidStatus: item.itemBidStatus, // itemBidStatus 추가, 기본값은 'active'
       }));
 
       setItems(formattedItems);
@@ -69,6 +70,7 @@ const HomeScreen = ({navigation}) => {
 
         const data = await getData(endpoint); // API 요청
         setItems(data);
+        console.log(data);
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);
       } finally {
