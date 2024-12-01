@@ -20,6 +20,7 @@ export const fetchDataAfterLogin = async (url, token) => {
         'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png',
       title: item.title,
       price: `${item.startingBid.toLocaleString()}원`,
+      itemBidStatus: item.itemBidStatus,
     }));
 
     return formattedItems;

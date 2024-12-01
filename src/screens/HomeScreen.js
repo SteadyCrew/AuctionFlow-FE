@@ -56,7 +56,7 @@ const HomeScreen = ({navigation}) => {
             endpoint = 'mypage/like/rank'; // 랭킹 데이터 API
             break;
           case '전체 목록':
-            endpoint = 'items/selling'; // 전체 목록 API
+            endpoint = 'items'; // 전체 목록 API
             break;
           case '판매 종료':
             endpoint = 'items/end'; // 판매 종료 API
@@ -90,13 +90,18 @@ const HomeScreen = ({navigation}) => {
 
     switch (selectedTab) {
       case '랭킹':
+        const filteredItems = items.filter(
+          item => item.itemBidStatus !== 'end',
+        );
         return (
           <View>
             <View style={styles.row}>
               <Text style={styles.text}>랭킹</Text>
-              <Text style={styles.subText}>현재 인기 있는 상품을 찾아보세요!</Text>
+              <Text style={styles.subText}>
+                현재 인기 있는 상품을 찾아보세요!
+              </Text>
             </View>
-            <Goods items={items} />
+            <Goods items={filteredItems} />
           </View>
         );
       case '전체 목록':
@@ -104,7 +109,9 @@ const HomeScreen = ({navigation}) => {
           <View>
             <View style={styles.row}>
               <Text style={styles.text}>전체 목록</Text>
-              <Text style={styles.subText}>상품 전체 목록을 한눈에 둘러보세요.</Text>
+              <Text style={styles.subText}>
+                상품 전체 목록을 한눈에 둘러보세요.
+              </Text>
             </View>
             <Goods items={items} />
           </View>
@@ -114,7 +121,9 @@ const HomeScreen = ({navigation}) => {
           <View>
             <View style={styles.row}>
               <Text style={styles.text}>판매 종료</Text>
-              <Text style={styles.subText}>판매가 종료된 상품의 적정가를 찾아보세요!</Text>
+              <Text style={styles.subText}>
+                판매가 종료된 상품의 적정가를 찾아보세요!
+              </Text>
             </View>
             <Goods items={items} />
           </View>
@@ -141,7 +150,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-
   },
   tabContainer: {
     paddingTop: 10,
