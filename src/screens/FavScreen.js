@@ -88,8 +88,14 @@ const FavScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Goods 컴포넌트 */}
-          <Goods items={items} onDelete={isEditing ? handleDelete : null} />
+          {/* 찜 상품이 없는 경우 문구 표시 */}
+          {items.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>찜 상품이 없습니다.</Text>
+            </View>
+          ) : (
+            <Goods items={items} onDelete={isEditing ? handleDelete : null} />
+          )}
         </>
       )}
     </View>
@@ -134,6 +140,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Pretendard-SemiBold',
     color: '#000', // 검정 텍스트
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center', // 수직 중앙 정렬
+    alignItems: 'center', // 수평 중앙 정렬
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: 'Pretendard-Regular',
+    color: '#909090', // 회색 텍스트 색상
   },
 });
 
