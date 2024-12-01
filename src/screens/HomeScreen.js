@@ -105,6 +105,11 @@ const HomeScreen = ({navigation}) => {
           </View>
         );
       case '전체 목록':
+        // 'end' 상태인 항목을 마지막으로 정렬
+        const sortedItems = [
+          ...items.filter(item => item.itemBidStatus !== 'end'), // 'end'가 아닌 항목
+          ...items.filter(item => item.itemBidStatus === 'end'), // 'end' 상태인 항목
+        ];
         return (
           <View>
             <View style={styles.row}>
@@ -113,7 +118,7 @@ const HomeScreen = ({navigation}) => {
                 상품 전체 목록을 한눈에 둘러보세요.
               </Text>
             </View>
-            <Goods items={items} />
+            <Goods items={sortedItems} />
           </View>
         );
       case '판매 종료':
