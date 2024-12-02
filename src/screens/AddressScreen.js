@@ -2,8 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
 import { AuthContext } from '../components/Auth/AuthContext';
+import CustomToast from '../components/CustomToast';
 
 function AddressScreen({ route }) {
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
   const { zipcode, areaAddress, townAddress } = route.params || {};  // 전달된 데이터 받기
   const [addressObj, setAddressObj] = useState({
     zipcode: zipcode || '',
@@ -54,10 +57,17 @@ function AddressScreen({ route }) {
         const data = await response.json();
   
         if (response.ok) {
-          alert('주소가 수정되었습니다.');
+          setToastMessage('주소가 수정 되었습니다.');
+          setToastVisible(true);  // 오류 메시지 표시
+
+        // 잠시 후 MyPageScreen으로 이동
+        setTimeout(() => {
           navigation.goBack();
+          setToastVisible(false); // 토스트 메시지 숨기기
+        }, 1000); // 2초 후에 이동
         } else {
-          alert('주소 수정에 실패했습니다.');
+          setToastMessage('주소 수정에 실패했습니다..');
+          setToastVisible(true);  // 오류 메시지 표시
         }
       } else {
         // 주소가 없는 경우, POST 요청
@@ -77,15 +87,17 @@ function AddressScreen({ route }) {
         const data = await response.json();
   
         if (response.ok) {
-          alert('주소가 저장되었습니다.');
+          setToastMessage('주소가 수정 되었습니다.');
+          setToastVisible(true);  // 오류 메시지 표시
           navigation.goBack();
         } else {
-          alert('주소 저장에 실패했습니다.');
+          setToastMessage('주소가 수정 되었습니다.');
+          setToastVisible(true);  // 오류 메시지 표시
         }
       }
     } catch (error) {
-      console.error(error);
-      alert('주소 저장 중 오류가 발생했습니다.');
+      setToastMessage('주소 저장 중 오류가 발생했습니다.');
+      setToastVisible(true);  // 오류 메시지 표시
     }
   };
   
@@ -126,6 +138,15 @@ function AddressScreen({ route }) {
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>저장</Text>
       </TouchableOpacity>
+
+      {/* CustomToast 컴포넌트 */}
+      {toastVisible && (
+        <CustomToast
+          message={toastMessage}
+          visible={toastVisible}
+          duration={3000} // 표시 시간을 3초로 설정
+        />
+      )}
 
     </View>
   );

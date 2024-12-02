@@ -2,11 +2,16 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../components/Auth/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import CustomToast from '../components/CustomToast';
 
 const MypageScreen = () => {
   const { nickname, logOut, token } = useContext(AuthContext); // nickname, logOut, token 가져오기
   const [address, setAddress] = useState(null); // 주소 상태 관리
   const navigation = useNavigation(); // useNavigation 훅 사용
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
+  
+  
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -35,10 +40,12 @@ const MypageScreen = () => {
           setAddress(null); // 주소 정보가 없으면 null로 설정
         }
       } else {
-        console.error('배송지 정보를 불러오는 데 실패했습니다.');
+        setToastMessage('배송지 정보를 불러오는데 실패하였습니다.');
+        setToastVisible(true);  // 오류 메시지 표시
       }
     } catch (error) {
-      // console.error(error);
+      setToastMessage('배송지 정보를 불러오는데 실패하였습니다.');
+      setToastVisible(true);  // 오류 메시지 표시
     }
   };
 
@@ -98,6 +105,14 @@ const MypageScreen = () => {
           <Text style={styles.addressText}>배송지를 설정해주세요.</Text>
         )}
       </View>
+      {/* CustomToast 컴포넌트 */}
+      {toastVisible && (
+        <CustomToast
+          message={toastMessage}
+          visible={toastVisible}
+          duration={3000} // 표시 시간을 3초로 설정
+        />
+      )}
     </View>
   );
 };
