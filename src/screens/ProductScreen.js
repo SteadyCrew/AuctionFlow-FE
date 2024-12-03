@@ -15,6 +15,7 @@ import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {AuthContext} from '../components/Auth/AuthContext';
 import {fetchDataAfterLogin} from '../components/API/fetchDataAfterLogin';
+import CustomToast from '../components/CustomToast';
 
 const ProductScreen = () => {
   const route = useRoute();
@@ -30,6 +31,8 @@ const ProductScreen = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const {token} = useContext(AuthContext);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
 
     // categoryId를 categoryName으로 변환하는 함수
     const getCategoryName = (categoryId) => {
@@ -138,7 +141,8 @@ const ProductScreen = () => {
   const handleBidSubmit = async () => {
     // 입찰 금액 유효성 검사
     if (bidError || !bidAmount) {
-      Alert.alert('입찰 금액이 유효하지 않습니다.');
+      setToastMessage('입찰 금액이 유효하지 않습니다.');
+      setToastVisible(true);  // 오류 메시지 표시
       return;
     }
 
@@ -150,12 +154,14 @@ const ProductScreen = () => {
   
     // 입찰 금액이 시작 가격보다 낮거나 현재 최고 입찰 금액보다 낮으면 경고
     if (parseInt(bidAmount, 10) < startPrice) {
-      Alert.alert(`입찰 금액은 시작 가격(${startPrice}원) 이상이어야 합니다.`);
+      setToastMessage(`입찰 금액은 시작 가격(${startPrice}원) 이상이어야 합니다.`);
+      setToastVisible(true);  // 오류 메시지 표시
       return;
     }
   
     if (parseInt(bidAmount, 10) <= highestBid) {
-      Alert.alert(`현재 최고 입찰 금액(${highestBid}원)보다 높은 금액을 제시해야 합니다.`);
+      setToastMessage(`현재 최고 입찰 금액인 (${highestBid}원) 보다 \n 높은 금액을 제시해야 합니다.`);
+      setToastVisible(true);  // 오류 메시지 표시
       return;
     }
   
@@ -174,7 +180,8 @@ const ProductScreen = () => {
         },
       );
 
-      Alert.alert('입찰이 성공적으로 완료되었습니다.');
+      setToastMessage('입찰이 완료되었습니다.');
+      setToastVisible(true);  // 오류 메시지 표시
       setBidAmount(''); // 입력 필드 초기화
       setBidError(''); // 오류 메시지 초기화
   
@@ -203,12 +210,15 @@ const ProductScreen = () => {
         if (error.response.status === 403) {
           Alert.alert('권한이 없습니다. 다시 시도해 주세요.');
         } else {
-          Alert.alert(error.response?.data?.message || '입찰에 실패했습니다.');
+          setToastMessage(error.response?.data?.message || '입찰에 실패했습니다.');
+          setToastVisible(true);  // 오류 메시지 표시
         }
       } else if (error.request) {
         Alert.alert("서버 응답이 없습니다. 다시 시도해주세요.");
       } else {
         Alert.alert("입찰에 실패했습니다.");
+        setToastMessage('입찰에 실패했습니다.');
+        setToastVisible(true);  // 오류 메시지 표시
       }
     }
   };
@@ -277,7 +287,8 @@ const ProductScreen = () => {
             data: {itemId}, // DELETE 요청에서 body 전달
           },
         );
-        Alert.alert('찜 목록에서 제거되었습니다!');
+        setToastMessage('찜 목록에서 제거 되었습니다!');
+        setToastVisible(true);  // 오류 메시지 표시
       } else {
         // POST 요청
         await axios.post(
@@ -289,7 +300,8 @@ const ProductScreen = () => {
             },
           },
         );
-        Alert.alert('찜 목록에 추가되었습니다!');
+        setToastMessage('찜 목록에 추가 되었습니다!');
+        setToastVisible(true);  // 오류 메시지 표시
       }
 
       setIsFavorited(!isFavorited); // 상태 업데이트
@@ -313,6 +325,7 @@ const ProductScreen = () => {
       : 'https://via.placeholder.com/150';
 
   return (
+    <View style={styles.container}>
     <ScrollView style={styles.container}>
     <View style={styles.imageGallery}>
       <TouchableOpacity
@@ -423,6 +436,15 @@ const ProductScreen = () => {
       </View>
     )}
   </ScrollView>
+        {/* CustomToast는 ScrollView 밖에 위치시키고 화면 하단에 고정 */}
+        {toastVisible && (
+        <CustomToast
+          message={toastMessage}
+          visible={toastVisible}
+          duration={3000} // 3초 동안 표시
+        />
+      )}
+  </View>
   );
 };
 

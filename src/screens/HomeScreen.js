@@ -68,7 +68,6 @@ const HomeScreen = ({navigation}) => {
 
         const data = await getData(endpoint); // API 요청
         setItems(data);
-        console.log(data);
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);
       } finally {
