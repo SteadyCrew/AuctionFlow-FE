@@ -94,7 +94,9 @@ const SearchResultScreen = ({route}) => {
           )}
 
           <Text style={styles.itemTitle}>{item.title}</Text>
-          <Text style={styles.itemPrice}>{item.startingBid} 원</Text>
+          <Text style={styles.itemPrice}>
+            {item.currentBid ? item.currentBid : 0} 원
+          </Text>
         </TouchableOpacity>
       </View>
     );
