@@ -19,7 +19,7 @@ export const fetchDataAfterLogin = async (url, token) => {
         item.productImageUrls[0] ||
         'https://archives.hangeul.go.kr/resource/template/images/img_none_01.png',
       title: item.title,
-      price: `${item.currendBid ? item.currendBid.toLocaleString() : 0}원`,
+      price: `${item.currentBid ? item.currentBid.toLocaleString() : 0}원`,
       itemBidStatus: item.itemBidStatus,
     }));
 
